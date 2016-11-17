@@ -78,10 +78,7 @@ namespace SlimJim.Infrastructure
 			}
 			catch (OptionException optEx)
 			{
-				if (ParseError != null)
-				{
-					ParseError(optEx.Message);
-				}
+			    ParseError?.Invoke(optEx.Message);
 			}
 		}
 
@@ -114,6 +111,5 @@ namespace SlimJim.Infrastructure
 		}
 
 		public event Action<string> ParseError;
-		public event Action<string> ShowHelp;
 	}
 }
