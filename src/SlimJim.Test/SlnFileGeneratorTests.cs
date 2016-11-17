@@ -11,65 +11,59 @@ namespace SlimJim.Test
 	public class SlnFileGeneratorTests : TestBase
 	{
 		private const string TargetProject = "MyProject";
-		private SlnFileGenerator gen;
-		private SlnFileWriter slnWriter;
-		private CsProjRepository repo;
-		private SlnBuilder slnBuilder;
-		private SlnGenerationOptions options;
-		private readonly List<CsProj> projects = new List<CsProj>();
-		private readonly Sln createdSlnObject = new Sln("Sln");
+		private SlnFileGenerator _gen;
+		private SlnFileWriter _slnWriter;
+		private CsProjRepository _repo;
+		private SlnBuilder _slnBuilder;
+		private SlnGenerationOptions _options;
+		private readonly List<CsProj> _projects = new List<CsProj>();
+		private readonly Sln _createdSlnObject = new Sln("Sln");
 
-		private string ProjectsDir
-		{
-			get
-			{
-				return GetSamplePath ("Projects");
-			}
-		}
-				
-		[SetUp]
+		private string ProjectsDir => GetSamplePath ("Projects");
+
+	    [SetUp]
 		public void BeforeEach()
 		{
-			repo = MockRepository.GenerateStrictMock<CsProjRepository>();
-			slnWriter = MockRepository.GenerateStrictMock<SlnFileWriter>();
-			slnBuilder = MockRepository.GenerateStrictMock<SlnBuilder>(new List<CsProj>());
+			_repo = MockRepository.GenerateStrictMock<CsProjRepository>();
+			_slnWriter = MockRepository.GenerateStrictMock<SlnFileWriter>();
+			_slnBuilder = MockRepository.GenerateStrictMock<SlnBuilder>(new List<CsProj>());
 
-			gen = new SlnFileGenerator()
+			_gen = new SlnFileGenerator()
 			{
-				ProjectRepository = repo,
-				SlnWriter = slnWriter
+				ProjectRepository = _repo,
+				SlnWriter = _slnWriter
 			};
 
-			SlnBuilder.OverrideDefaultBuilder(slnBuilder);
-			options = new SlnGenerationOptions(ProjectsDir);
+			SlnBuilder.OverrideDefaultBuilder(_slnBuilder);
+			_options = new SlnGenerationOptions(ProjectsDir);
 		}
 
 		[Test]
 		public void CreatesOwnInstancesOfRepositoryAndWriter()
 		{
-			gen = new SlnFileGenerator();
-			Assert.That(gen.ProjectRepository, Is.Not.Null, "Should have created instance of CsProjRepository.");
-			Assert.That(gen.SlnWriter, Is.Not.Null, "Should have created instance of SlnFileWriter.");
+			_gen = new SlnFileGenerator();
+			Assert.That(_gen.ProjectRepository, Is.Not.Null, "Should have created instance of CsProjRepository.");
+			Assert.That(_gen.SlnWriter, Is.Not.Null, "Should have created instance of SlnFileWriter.");
 		}
 
 		[Test]
 		public void GeneratesSlnFileForGivenOptions()
 		{
-			options.TargetProjectNames.Add(TargetProject);
+			_options.TargetProjectNames.Add(TargetProject);
 
-			repo.Expect(r => r.LookupCsProjsFromDirectory(options)).Return(projects);
-			slnBuilder.Expect(bld => bld.BuildSln(options)).Return(createdSlnObject);
-			slnWriter.Expect(wr => wr.WriteSlnFile(createdSlnObject, ProjectsDir));
+			_repo.Expect(r => r.LookupCsProjsFromDirectory(_options)).Return(_projects);
+			_slnBuilder.Expect(bld => bld.BuildSln(_options)).Return(_createdSlnObject);
+			_slnWriter.Expect(wr => wr.WriteSlnFile(_createdSlnObject, ProjectsDir));
 
-			gen.GenerateSolutionFile(options);
+			_gen.GenerateSolutionFile(_options);
 		}
 
 		[TearDown]
 		public void AfterEach()
 		{
-			repo.VerifyAllExpectations();
-			slnWriter.VerifyAllExpectations();
-			slnBuilder.VerifyAllExpectations();
+			_repo.VerifyAllExpectations();
+			_slnWriter.VerifyAllExpectations();
+			_slnBuilder.VerifyAllExpectations();
 		}
 	}
 }

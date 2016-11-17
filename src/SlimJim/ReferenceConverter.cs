@@ -38,10 +38,10 @@ namespace SlimJim
 
 			XPathNavigator projectReference;
 
-			while ((projectReference = nav.SelectSingleNode("//msb:ProjectReference[msb:SlimJimReplacedReference and 1]", nsMgr)) != null)
+			while ((projectReference = nav.SelectSingleNode("//msb:ProjectReference[msb:SlimJimReplacedReference and 1]", NsMgr)) != null)
 			{
-				var original = projectReference.SelectSingleNode("./msb:SlimJimReplacedReference/msb:Reference", nsMgr);
-				log.InfoFormat("Restoring project {0} assembly reference to {1}", project.ProjectName, projectReference.GetAttribute("Include", ""));
+				var original = projectReference.SelectSingleNode("./msb:SlimJimReplacedReference/msb:Reference", NsMgr);
+				Log.InfoFormat("Restoring project {0} assembly reference to {1}", project.ProjectName, projectReference.GetAttribute("Include", ""));
 				projectReference.ReplaceSelf(original);
 			}
 
@@ -55,25 +55,25 @@ namespace SlimJim
 
 			foreach (var reference in references)
 			{
-				log.InfoFormat("Converting project {0} assembly reference {1} to project reference {2}.", project.AssemblyName, reference.AssemblyName, reference.Path);
+				Log.InfoFormat("Converting project {0} assembly reference {1} to project reference {2}.", project.AssemblyName, reference.AssemblyName, reference.Path);
 
 				var xpath =
 				    $"//msb:ItemGroup/msb:Reference[substring-before(concat(@Include, ','), ',') = '{reference.AssemblyName}']";
 
-				var element = nav.SelectSingleNode(xpath, nsMgr);
+				var element = nav.SelectSingleNode(xpath, NsMgr);
 
 				if (element == null)
 				{
-					log.ErrorFormat("Failed to locate Reference element in {0} for assembly {1}.", project.Path, reference.AssemblyName);
+					Log.ErrorFormat("Failed to locate Reference element in {0} for assembly {1}.", project.Path, reference.AssemblyName);
 					continue;
 				}
 
-				var projectReference = doc.CreateElement("ProjectReference", MSBuildXmlNamespace);
+				var projectReference = doc.CreateElement("ProjectReference", MsBuildXmlNamespace);
 				projectReference.SetAttribute("Include", reference.Path);
 				projectReference.AppendChild(CreateElementWithInnerText(doc, "Project", reference.Guid));
 				projectReference.AppendChild(CreateElementWithInnerText(doc, "Name", reference.ProjectName));
 
-				var wrapper = doc.CreateElement("SlimJimReplacedReference", MSBuildXmlNamespace);
+				var wrapper = doc.CreateElement("SlimJimReplacedReference", MsBuildXmlNamespace);
 				wrapper.AppendChild(((XmlNode) element.UnderlyingObject).Clone());
 
 				projectReference.AppendChild(wrapper);
@@ -86,7 +86,7 @@ namespace SlimJim
 
 		private new static XmlElement CreateElementWithInnerText(XmlDocument doc, string elementName, string text)
 		{
-			var e = doc.CreateElement(elementName, MSBuildXmlNamespace);
+			var e = doc.CreateElement(elementName, MsBuildXmlNamespace);
 			e.InnerText = text;
 			return e;
 		}

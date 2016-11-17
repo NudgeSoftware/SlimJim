@@ -22,42 +22,36 @@ namespace SlimJim.Model
 			Version = VisualStudioVersion.VS2010;
 		}
 
-		private readonly IDictionary<string, Folder> folders = new Dictionary<string, Folder>();
+		private readonly IDictionary<string, Folder> _folders = new Dictionary<string, Folder>();
 
 		public string Name { get; private set; }
 		public string Guid { get; private set; }
 		public VisualStudioVersion Version { get; set; }
 
-		private string projectsRootDirectory;
+		private string _projectsRootDirectory;
 		public string ProjectsRootDirectory
 		{
 			get
 			{
-				return projectsRootDirectory;
+				return _projectsRootDirectory;
 			}
 			set
 			{
 				if (value != null && (value.EndsWith("/") || value.EndsWith(@"\")))
 				{
-					projectsRootDirectory = value.Substring(0, value.Length - 1);
+					_projectsRootDirectory = value.Substring(0, value.Length - 1);
 				}
 				else
 				{
-					projectsRootDirectory = value;
+					_projectsRootDirectory = value;
 				}
 			}
 		}
 		public List<CsProj> Projects { get; private set; }
 
-		public IEnumerable<Folder> Folders
-		{
-			get
-			{
-				return folders.Count > 0 ? folders.Values : null;
-			}
-		}
+		public IEnumerable<Folder> Folders => _folders.Count > 0 ? _folders.Values : null;
 
-		public void AddProjects(params CsProj[] csProjs)
+	    public void AddProjects(params CsProj[] csProjs)
 		{
 			foreach (CsProj proj in csProjs)
 			{
@@ -95,7 +89,7 @@ namespace SlimJim.Model
 		{
 			Folder folder;
 
-			if (folders.TryGetValue(relativeFolderPath, out folder)) return folder;
+			if (_folders.TryGetValue(relativeFolderPath, out folder)) return folder;
 
 			Log.Debug("Creating solution folder for " + relativeFolderPath);
 
@@ -109,7 +103,7 @@ namespace SlimJim.Model
 				parentFolder.AddContent(newFolder.Guid);
 			}
 
-			folders[relativeFolderPath] = newFolder;
+			_folders[relativeFolderPath] = newFolder;
 
 			return newFolder;
 		}

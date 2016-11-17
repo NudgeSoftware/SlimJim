@@ -54,7 +54,7 @@ namespace SlimJim
 		private void WarnOnMissingNuGetTargets(List<CsProj> projects, SlnGenerationOptions options)
 		{
 			var nugetTargetsPath = Path.Combine(options.SlnOutputPath, ".nuget", "nuget.targets");
-			if (projects.Any(p => p.UsesMSBuildPackageRestore) && !File.Exists(nugetTargetsPath))
+			if (projects.Any(p => p.UsesMsBuildPackageRestore) && !File.Exists(nugetTargetsPath))
 			{
 				Log.WarnFormat(
 					"One or more of the projects included use MSBuild-based NuGet package restore. " +

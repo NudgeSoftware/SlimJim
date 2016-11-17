@@ -7,24 +7,24 @@ namespace SlimJim.Test.Model.SlnBuilder
 {
 	public class SlnBuilderTestFixture : TestBase
 	{
-		protected string targetProjectName;
-		protected Sln solution;
-		protected ProjectPrototypes projects;
-		protected SlnGenerationOptions options;
+		protected string TargetProjectName;
+		protected Sln Solution;
+		protected ProjectPrototypes Projects;
+		protected SlnGenerationOptions Options;
 
 		[SetUp]
 		public void BeforeEach()
 		{
-			projects = new ProjectPrototypes();
-			targetProjectName = projects.MyProject.AssemblyName;
-			options = new SlnGenerationOptions(GetSamplePath("Projects"));
+			Projects = new ProjectPrototypes();
+			TargetProjectName = Projects.MyProject.AssemblyName;
+			Options = new SlnGenerationOptions(GetSamplePath("Projects"));
 		}
 
 		protected void GeneratePartialGraphSolution(string[] targetProjectNames, params CsProj[] projectsList)
 		{
 			var generator = new SlimJim.Model.SlnBuilder(new List<CsProj>(projectsList));
-			options.AddTargetProjectNames(targetProjectNames);
-			solution = generator.BuildSln(options);
+			Options.AddTargetProjectNames(targetProjectNames);
+			Solution = generator.BuildSln(Options);
 		}
 	}
 }

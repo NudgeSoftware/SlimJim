@@ -1,6 +1,7 @@
 ﻿Microsoft Visual Studio Solution File, Format Version $sln.Version.SlnFileVersionNumber$
-# Visual Studio $sln.Version.Year$
-
+# Visual Studio $sln.Version.SlnVisualStudioVersion$
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
 $sln.Projects:{ p | Project("$sln.Guid$") = "$p.AssemblyName$", "$p.Path$", "$p.Guid$"
 EndProject};separator="\r\n"$
 $if(sln.Folders)$

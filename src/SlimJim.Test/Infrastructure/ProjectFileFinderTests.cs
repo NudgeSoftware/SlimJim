@@ -11,19 +11,19 @@ namespace SlimJim.Test.Infrastructure
 	public class ProjectFileFinderTests : TestBase
 	{
 		private static readonly string SampleFileSystemPath = SampleFileHelper.GetSampleFileSystemPath();
-		private ProjectFileFinder finder;
-		private List<FileInfo> projectFiles;
+		private ProjectFileFinder _finder;
+		private List<FileInfo> _projectFiles;
 
 		[SetUp]
 		public void BeforeEach()
 		{
-			finder = new ProjectFileFinder();
+			_finder = new ProjectFileFinder();
 		}
 
 		[Test]
 		public void FindsOneProjectInFolderWithCsproj()
 		{
-			projectFiles = finder.FindAllProjectFiles(Path.Combine(SampleFileSystemPath, @"MyProject"));
+			_projectFiles = _finder.FindAllProjectFiles(Path.Combine(SampleFileSystemPath, @"MyProject"));
 
 			AssertFilesMatching(new[]
 				{
@@ -34,7 +34,7 @@ namespace SlimJim.Test.Infrastructure
 		[Test]
 		public void ReturnsFileInfosForEachProjectInFileSystem()
 		{
-			projectFiles = finder.FindAllProjectFiles(SampleFileSystemPath);
+			_projectFiles = _finder.FindAllProjectFiles(SampleFileSystemPath);
 
 			AssertFilesMatching(new[]
 				{
@@ -50,8 +50,8 @@ namespace SlimJim.Test.Infrastructure
 		[Test]
 		public void IgnoresRelativePath()
 		{
-			finder.IgnorePatterns("Theirs");
-			projectFiles = finder.FindAllProjectFiles(SampleFileSystemPath);
+			_finder.IgnorePatterns("Theirs");
+			_projectFiles = _finder.FindAllProjectFiles(SampleFileSystemPath);
 
 			AssertFilesMatching(new[]
 				{
@@ -64,8 +64,8 @@ namespace SlimJim.Test.Infrastructure
 		[Test]
 		public void IgnoresFileName()
 		{
-			finder.IgnorePatterns("TheirProject3.csproj");
-			projectFiles = finder.FindAllProjectFiles(SampleFileSystemPath);
+			_finder.IgnorePatterns("TheirProject3.csproj");
+			_projectFiles = _finder.FindAllProjectFiles(SampleFileSystemPath);
 
 			AssertFilesMatching(new[]
 				{
@@ -80,8 +80,8 @@ namespace SlimJim.Test.Infrastructure
 		[Test]
 		public void IgnoresRelativePathWithDifferentCase()
 		{
-			finder.IgnorePatterns("ThEiRs");
-			projectFiles = finder.FindAllProjectFiles(SampleFileSystemPath);
+			_finder.IgnorePatterns("ThEiRs");
+			_projectFiles = _finder.FindAllProjectFiles(SampleFileSystemPath);
 
 			AssertFilesMatching(new[]
 				{
@@ -94,30 +94,30 @@ namespace SlimJim.Test.Infrastructure
 		[Test]
 		public void IgnoresCertainFoldersByDefault()
 		{
-			Assert.That(finder.PathIsIgnored(new DirectoryInfo(Path.Combine(WorkingDirectory, ".svn"))), Is.True, ".svn folders ignored");
-			Assert.That(finder.PathIsIgnored(new DirectoryInfo(Path.Combine(WorkingDirectory, "doo.svn.wop"))), Is.False, "don't ignore folders with .svn in the name");
-			Assert.That(finder.PathIsIgnored(new DirectoryInfo(Path.Combine(WorkingDirectory, ".hg"))), Is.True, ".hg folders ignored");
-			Assert.That(finder.PathIsIgnored(new DirectoryInfo(Path.Combine(WorkingDirectory, "doo.hg.wop"))), Is.False, "don't ignore folders with .hg in the name");
-			Assert.That(finder.PathIsIgnored(new DirectoryInfo(Path.Combine(WorkingDirectory, ".git"))), Is.True, ".git folders ignored");
-			Assert.That(finder.PathIsIgnored(new DirectoryInfo(Path.Combine(WorkingDirectory, "doo.git.wop"))), Is.False, "don't ignore folders with .git in the name");
-			Assert.That(finder.PathIsIgnored(new DirectoryInfo(Path.Combine(WorkingDirectory, "bin"))), Is.True, "bin folders ignored");
-			Assert.That(finder.PathIsIgnored(new DirectoryInfo(Path.Combine(WorkingDirectory, "obing"))), Is.False, "don't ignore folders with bin in the name");
-			Assert.That(finder.PathIsIgnored(new DirectoryInfo(Path.Combine(WorkingDirectory, "obj"))), Is.True, "obj folders ignored");
-			Assert.That(finder.PathIsIgnored(new DirectoryInfo(Path.Combine(WorkingDirectory, "blobjee"))), Is.False, "don't ignore folders with obj in the name");
+			Assert.That(_finder.PathIsIgnored(new DirectoryInfo(Path.Combine(WorkingDirectory, ".svn"))), Is.True, ".svn folders ignored");
+			Assert.That(_finder.PathIsIgnored(new DirectoryInfo(Path.Combine(WorkingDirectory, "doo.svn.wop"))), Is.False, "don't ignore folders with .svn in the name");
+			Assert.That(_finder.PathIsIgnored(new DirectoryInfo(Path.Combine(WorkingDirectory, ".hg"))), Is.True, ".hg folders ignored");
+			Assert.That(_finder.PathIsIgnored(new DirectoryInfo(Path.Combine(WorkingDirectory, "doo.hg.wop"))), Is.False, "don't ignore folders with .hg in the name");
+			Assert.That(_finder.PathIsIgnored(new DirectoryInfo(Path.Combine(WorkingDirectory, ".git"))), Is.True, ".git folders ignored");
+			Assert.That(_finder.PathIsIgnored(new DirectoryInfo(Path.Combine(WorkingDirectory, "doo.git.wop"))), Is.False, "don't ignore folders with .git in the name");
+			Assert.That(_finder.PathIsIgnored(new DirectoryInfo(Path.Combine(WorkingDirectory, "bin"))), Is.True, "bin folders ignored");
+			Assert.That(_finder.PathIsIgnored(new DirectoryInfo(Path.Combine(WorkingDirectory, "obing"))), Is.False, "don't ignore folders with bin in the name");
+			Assert.That(_finder.PathIsIgnored(new DirectoryInfo(Path.Combine(WorkingDirectory, "obj"))), Is.True, "obj folders ignored");
+			Assert.That(_finder.PathIsIgnored(new DirectoryInfo(Path.Combine(WorkingDirectory, "blobjee"))), Is.False, "don't ignore folders with obj in the name");
 		}
 
 		[Test]
 		public void IgnoresReSharperFolders()
 		{
-			Assert.That(finder.PathIsIgnored(new DirectoryInfo(Path.Combine(WorkingDirectory, "_ReSharper.Something"))), Is.True);
-			Assert.That(finder.PathIsIgnored(new DirectoryInfo(Path.Combine(WorkingDirectory, "ReSharper"))), Is.True);
-			Assert.That(finder.PathIsIgnored(new DirectoryInfo(Path.Combine(WorkingDirectory, "___ReSharper___"))), Is.True);
+			Assert.That(_finder.PathIsIgnored(new DirectoryInfo(Path.Combine(WorkingDirectory, "_ReSharper.Something"))), Is.True);
+			Assert.That(_finder.PathIsIgnored(new DirectoryInfo(Path.Combine(WorkingDirectory, "ReSharper"))), Is.True);
+			Assert.That(_finder.PathIsIgnored(new DirectoryInfo(Path.Combine(WorkingDirectory, "___ReSharper___"))), Is.True);
 		}
 
 		private void AssertFilesMatching(string[] expectedPaths)
 		{
 			expectedPaths = expectedPaths.Select(p => p.Replace ('\\', Path.DirectorySeparatorChar)).ToArray ();
-			Assert.That(projectFiles.ConvertAll(file => file.FullName.Replace(SampleFileSystemPath, "")), Is.EqualTo(expectedPaths));
+			Assert.That(_projectFiles.ConvertAll(file => file.FullName.Replace(SampleFileSystemPath, "")), Is.EqualTo(expectedPaths));
 		}
 	}
 }

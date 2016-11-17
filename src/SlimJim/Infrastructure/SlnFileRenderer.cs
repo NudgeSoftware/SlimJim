@@ -8,27 +8,27 @@ namespace SlimJim.Infrastructure
 {
 	public class SlnFileRenderer
 	{
-		private static readonly StringTemplateGroup templateGroup;
-		private readonly Sln solution;
+		private static readonly StringTemplateGroup TemplateGroup;
+		private readonly Sln _solution;
 
 		static SlnFileRenderer()
 		{
 			var stream = typeof (SlnFileRenderer).Assembly.GetManifestResourceStream("SlimJim.Templates.SolutionTemplate.st");
-			templateGroup = new StringTemplateGroup("SlnTemplates");
+			TemplateGroup = new StringTemplateGroup("SlnTemplates");
 			using (stream)
 			{
-				templateGroup.DefineTemplate("SolutionTemplate", new StreamReader(stream).ReadToEnd());
+				TemplateGroup.DefineTemplate("SolutionTemplate", new StreamReader(stream).ReadToEnd());
 			}
 		}
 		public SlnFileRenderer(Sln solution)
 		{
-			this.solution = solution;
+			this._solution = solution;
 		}
 
 		public string Render()
 		{
-			var slnTemplate = templateGroup.GetInstanceOf("SolutionTemplate");
-			slnTemplate.SetAttribute("sln", solution);
+			var slnTemplate = TemplateGroup.GetInstanceOf("SolutionTemplate");
+			slnTemplate.SetAttribute("sln", _solution);
 			return slnTemplate.ToString();
 		}
 	}

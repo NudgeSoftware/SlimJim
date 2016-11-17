@@ -6,18 +6,18 @@ namespace SlimJim
 {
 	public abstract class CsProjConverter
 	{
-		protected const string MSBuildXmlNamespace = "http://schemas.microsoft.com/developer/msbuild/2003";
-		protected readonly ILog log;
-		protected XmlNamespaceManager nsMgr;
+		protected const string MsBuildXmlNamespace = "http://schemas.microsoft.com/developer/msbuild/2003";
+		protected readonly ILog Log;
+		protected XmlNamespaceManager NsMgr;
 
 		protected CsProjConverter()
 		{
-			log = LogManager.GetLogger(GetType());
+			Log = LogManager.GetLogger(GetType());
 		}
 
 		protected static XmlElement CreateElementWithInnerText(XmlDocument doc, string elementName, string text)
 		{
-			var e = doc.CreateElement(elementName, MSBuildXmlNamespace);
+			var e = doc.CreateElement(elementName, MsBuildXmlNamespace);
 			e.InnerText = text;
 			return e;
 		}
@@ -26,8 +26,8 @@ namespace SlimJim
 		{
 			var doc = new XmlDocument();
 			doc.Load(project.Path);
-			nsMgr = new XmlNamespaceManager(doc.NameTable);
-			nsMgr.AddNamespace("msb", MSBuildXmlNamespace);
+			NsMgr = new XmlNamespaceManager(doc.NameTable);
+			NsMgr.AddNamespace("msb", MsBuildXmlNamespace);
 			return doc;
 		}
 	}

@@ -33,7 +33,7 @@ namespace SlimJim.Infrastructure
 				TargetFrameworkVersion = properties.Element(Ns + "TargetFrameworkVersion").ValueOrDefault(),
 				ReferencedAssemblyNames = ReadReferencedAssemblyNames(xml),
 				ReferencedProjectGuids = ReadReferencedProjectGuids(xml, csProjFile),
-				UsesMSBuildPackageRestore = FindImportedNuGetTargets(xml)
+				UsesMsBuildPackageRestore = FindImportedNuGetTargets(xml)
 			};
 		}
 

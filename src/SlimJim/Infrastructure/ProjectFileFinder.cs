@@ -10,11 +10,11 @@ namespace SlimJim.Infrastructure
 	public class ProjectFileFinder
 	{
 		private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-		private readonly List<Regex> ignorePatterns;
+		private readonly List<Regex> _ignorePatterns;
 
 		public ProjectFileFinder()
 		{
-			ignorePatterns = new List<Regex>();
+			_ignorePatterns = new List<Regex>();
 			IgnorePatterns(@"^\.svn$", @"^\.hg$", @"^\.git$", "^bin$", "^obj$", "ReSharper");
 		}
 
@@ -81,13 +81,13 @@ namespace SlimJim.Infrastructure
 
 		public bool PathIsIgnored(string name)
 		{
-			return ignorePatterns.Exists(p => p.IsMatch(name));
+			return _ignorePatterns.Exists(p => p.IsMatch(name));
 		}
 
 		public virtual void IgnorePatterns(params string[] patterns)
 		{
 			var regexes = new List<string>(patterns).ConvertAll(p => new Regex(p, RegexOptions.IgnoreCase));
-			ignorePatterns.AddRange(regexes);
+			_ignorePatterns.AddRange(regexes);
 		}
 	}
 }

@@ -11,102 +11,90 @@ namespace SlimJim.Test.Infrastructure
 	[TestFixture]
 	public class CsProjRepositoryTests : TestBase
 	{
-		private string SearchPath1
-		{
-			get
-			{
-				return GetSamplePath("OtherProjects");
-			}
-		}
+		private string SearchPath1 => GetSamplePath("OtherProjects");
 
-		private string SearchPath2
-		{
-			get
-			{
-				return GetSamplePath("MoreProjects");
-			}
-		}
+	    private string SearchPath2 => GetSamplePath("MoreProjects");
 
-		private readonly FileInfo file1 = SampleFileHelper.GetCsProjFile("Simple");
-		private readonly FileInfo file2 = SampleFileHelper.GetCsProjFile("Simple");
-		private readonly CsProj proj1 = new CsProj {AssemblyName = "Proj1"};
-		private readonly CsProj proj2 = new CsProj {AssemblyName = "Proj1"};
-		private ProjectFileFinder finder;
-		private CsProjReader reader;
-		private CsProjRepository repository;
-		private SlnGenerationOptions options;
+	    private readonly FileInfo _file1 = SampleFileHelper.GetCsProjFile("Simple");
+		private readonly FileInfo _file2 = SampleFileHelper.GetCsProjFile("Simple");
+		private readonly CsProj _proj1 = new CsProj {AssemblyName = "Proj1"};
+		private readonly CsProj _proj2 = new CsProj {AssemblyName = "Proj1"};
+		private ProjectFileFinder _finder;
+		private CsProjReader _reader;
+		private CsProjRepository _repository;
+		private SlnGenerationOptions _options;
 
 		[SetUp]
 		public void BeforeEach()
 		{
-			options = new SlnGenerationOptions(WorkingDirectory);
-			finder = MockRepository.GenerateStrictMock<ProjectFileFinder>();
-			reader = MockRepository.GenerateStrictMock<CsProjReader>();
-			repository = new CsProjRepository
+			_options = new SlnGenerationOptions(WorkingDirectory);
+			_finder = MockRepository.GenerateStrictMock<ProjectFileFinder>();
+			_reader = MockRepository.GenerateStrictMock<CsProjReader>();
+			_repository = new CsProjRepository
 			{
-				Finder = finder,
-				Reader = reader
+				Finder = _finder,
+				Reader = _reader
 			};
 		}
 
 		[TearDown]
 		public void AfterEach()
 		{
-			finder.VerifyAllExpectations();
-			reader.VerifyAllExpectations();
+			_finder.VerifyAllExpectations();
+			_reader.VerifyAllExpectations();
 		}
 
 		[Test]
 		public void CreatesOwnInstancesOfFinderAndReader()
 		{
-			repository = new CsProjRepository();
-			Assert.That(repository.Finder, Is.Not.Null, "Should have created instance of CsProjFinder.");
-			Assert.That(repository.Reader, Is.Not.Null, "Should have created instance of CsProjReader.");
+			_repository = new CsProjRepository();
+			Assert.That(_repository.Finder, Is.Not.Null, "Should have created instance of CsProjFinder.");
+			Assert.That(_repository.Reader, Is.Not.Null, "Should have created instance of CsProjReader.");
 		}
 
 		[Test]
 		public void GetsFilesFromFinderAndProcessesThemWithCsProjReader()
 		{
-			finder.Expect(f => f.FindAllProjectFiles(WorkingDirectory)).Return(new List<FileInfo>{file1, file2});
-			reader.Expect(r => r.Read(file1)).Return(proj1);
-			reader.Expect(r => r.Read(file2)).Return(proj2);
+			_finder.Expect(f => f.FindAllProjectFiles(WorkingDirectory)).Return(new List<FileInfo>{_file1, _file2});
+			_reader.Expect(r => r.Read(_file1)).Return(_proj1);
+			_reader.Expect(r => r.Read(_file2)).Return(_proj2);
 
-			List<CsProj> projects = repository.LookupCsProjsFromDirectory(options);
+			List<CsProj> projects = _repository.LookupCsProjsFromDirectory(_options);
 
-			Assert.That(projects, Is.EqualTo(new[]{proj1, proj2}));
+			Assert.That(projects, Is.EqualTo(new[]{_proj1, _proj2}));
 		}
 
 		[Test]
 		public void GracefullyHandlesNullsFromReader()
 		{
-			finder.Expect(f => f.FindAllProjectFiles(WorkingDirectory)).Return(new List<FileInfo> { file1, file2 });
-			reader.Expect(r => r.Read(file1)).Return(proj1);
-			reader.Expect(r => r.Read(file2)).Return(null);
+			_finder.Expect(f => f.FindAllProjectFiles(WorkingDirectory)).Return(new List<FileInfo> { _file1, _file2 });
+			_reader.Expect(r => r.Read(_file1)).Return(_proj1);
+			_reader.Expect(r => r.Read(_file2)).Return(null);
 
-			List<CsProj> projects = repository.LookupCsProjsFromDirectory(options);
+			List<CsProj> projects = _repository.LookupCsProjsFromDirectory(_options);
 
-			Assert.That(projects, Is.EqualTo(new[] { proj1 }));
+			Assert.That(projects, Is.EqualTo(new[] { _proj1 }));
 		}
 
 		[Test]
 		public void ReadsFilesFromAdditionalSearchPathsAsWell()
 		{
-			options.AddAdditionalSearchPaths(new[] { SearchPath1, SearchPath2 });
-			finder.Expect(f => f.FindAllProjectFiles(WorkingDirectory)).Return(new List<FileInfo>());
-			finder.Expect(f => f.FindAllProjectFiles(SearchPath1)).Return(new List<FileInfo>());
-			finder.Expect(f => f.FindAllProjectFiles(SearchPath2)).Return(new List<FileInfo>());
+			_options.AddAdditionalSearchPaths(new[] { SearchPath1, SearchPath2 });
+			_finder.Expect(f => f.FindAllProjectFiles(WorkingDirectory)).Return(new List<FileInfo>());
+			_finder.Expect(f => f.FindAllProjectFiles(SearchPath1)).Return(new List<FileInfo>());
+			_finder.Expect(f => f.FindAllProjectFiles(SearchPath2)).Return(new List<FileInfo>());
 
-			repository.LookupCsProjsFromDirectory(options);
+			_repository.LookupCsProjsFromDirectory(_options);
 		}
 
 		[Test]
 		public void IngoresDirectoryPatternsInOptions()
 		{
-			options.AddIgnoreDirectoryPatterns("Folder1", "Folder2");
-			finder.Expect(f => f.IgnorePatterns(new[] {"Folder1", "Folder2"}));
-			finder.Expect(f => f.FindAllProjectFiles(WorkingDirectory)).Return(new List<FileInfo>());
+			_options.AddIgnoreDirectoryPatterns("Folder1", "Folder2");
+			_finder.Expect(f => f.IgnorePatterns(new[] {"Folder1", "Folder2"}));
+			_finder.Expect(f => f.FindAllProjectFiles(WorkingDirectory)).Return(new List<FileInfo>());
 
-			repository.LookupCsProjsFromDirectory(options);
+			_repository.LookupCsProjsFromDirectory(_options);
 		}
 	}
 }

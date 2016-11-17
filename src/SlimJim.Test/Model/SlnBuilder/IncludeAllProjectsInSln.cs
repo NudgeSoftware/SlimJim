@@ -8,10 +8,10 @@ namespace SlimJim.Test.Model.SlnBuilder
 		[Test]
 		public void WithNoTargetsInOptionsAllProjectsAreIncluded()
 		{
-			GeneratePartialGraphSolution(new string[0], projects.MyProject, projects.OurProject1, 
-				projects.TheirProject1, projects.Unrelated1);
-			Assert.That(solution.Projects, Is.EqualTo(new[] {projects.MyProject, projects.OurProject1, 
-				projects.TheirProject1, projects.Unrelated1}));
+			GeneratePartialGraphSolution(new string[0], Projects.MyProject, Projects.OurProject1, 
+				Projects.TheirProject1, Projects.Unrelated1);
+			Assert.That(Solution.Projects, Is.EqualTo(new[] {Projects.MyProject, Projects.OurProject1, 
+				Projects.TheirProject1, Projects.Unrelated1}));
 		}
 	}
 }

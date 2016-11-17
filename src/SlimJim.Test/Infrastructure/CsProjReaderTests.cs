@@ -8,7 +8,7 @@ namespace SlimJim.Test.Infrastructure
 	[TestFixture]
 	public class CsProjReaderTests
 	{
-		private FileInfo file;
+		private FileInfo _file;
 
 		[Test]
 		public void ReadsFileContentsIntoObject()
@@ -17,7 +17,7 @@ namespace SlimJim.Test.Infrastructure
 
 			Assert.That(project.Guid, Is.EqualTo("{4A37C916-5AA3-4C12-B7A8-E5F878A5CDBA}"));
 			Assert.That(project.AssemblyName, Is.EqualTo("MyProject"));
-			Assert.That(project.Path, Is.EqualTo(file.FullName));
+			Assert.That(project.Path, Is.EqualTo(_file.FullName));
 			Assert.That(project.TargetFrameworkVersion, Is.EqualTo("v4.0"));
 			Assert.That(project.ReferencedAssemblyNames, Is.EqualTo(new[]
 																   	{
@@ -53,7 +53,7 @@ namespace SlimJim.Test.Infrastructure
 		}
 
 		[Test]
-		public void NoProjectReferencesDoesNotCauseNRE()
+		public void NoProjectReferencesDoesNotCauseNre()
 		{
 			CsProj project = GetProject("NoProjectReferences");
 
@@ -70,9 +70,9 @@ namespace SlimJim.Test.Infrastructure
 
 		private CsProj GetProject(string fileName)
 		{
-			file = SampleFiles.SampleFileHelper.GetCsProjFile(fileName);
+			_file = SampleFiles.SampleFileHelper.GetCsProjFile(fileName);
 			var reader = new CsProjReader();
-			return reader.Read(file);
+			return reader.Read(_file);
 		}
 	}
 }

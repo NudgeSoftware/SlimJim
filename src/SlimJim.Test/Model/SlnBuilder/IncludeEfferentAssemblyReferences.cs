@@ -8,25 +8,25 @@ namespace SlimJim.Test.Model.SlnBuilder
 		[Test]
 		public void EfferentAssemblyReferencesAreIncludedForAllProjectsInSln()
 		{
-			options.IncludeEfferentAssemblyReferences = true;
-			projects.MyProject.ReferencesAssemblies(projects.TheirProject1, projects.TheirProject2);
-			projects.TheirProject2.ReferencesProjects(projects.TheirProject3);
-			projects.OurProject1.ReferencesAssemblies(projects.MyProject, projects.OurProject2);
-			GeneratePartialGraphSolution(new[] {targetProjectName},
-										 projects.MyProject,
-										 projects.TheirProject1,
-										 projects.TheirProject2,
-										 projects.TheirProject3,
-										 projects.OurProject1,
-										 projects.OurProject2);
-			Assert.That(solution.Projects, Is.EqualTo(new[]
+			Options.IncludeEfferentAssemblyReferences = true;
+			Projects.MyProject.ReferencesAssemblies(Projects.TheirProject1, Projects.TheirProject2);
+			Projects.TheirProject2.ReferencesProjects(Projects.TheirProject3);
+			Projects.OurProject1.ReferencesAssemblies(Projects.MyProject, Projects.OurProject2);
+			GeneratePartialGraphSolution(new[] {TargetProjectName},
+										 Projects.MyProject,
+										 Projects.TheirProject1,
+										 Projects.TheirProject2,
+										 Projects.TheirProject3,
+										 Projects.OurProject1,
+										 Projects.OurProject2);
+			Assert.That(Solution.Projects, Is.EqualTo(new[]
 														  {
-															  projects.MyProject,
-															  projects.TheirProject1,
-															  projects.TheirProject2,
-															  projects.TheirProject3,
-															  projects.OurProject1,
-															  projects.OurProject2
+															  Projects.MyProject,
+															  Projects.TheirProject1,
+															  Projects.TheirProject2,
+															  Projects.TheirProject3,
+															  Projects.OurProject1,
+															  Projects.OurProject2
 														  }));
 		}
 	}

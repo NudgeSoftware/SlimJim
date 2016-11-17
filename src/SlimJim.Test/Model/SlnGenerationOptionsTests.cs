@@ -7,70 +7,70 @@ namespace SlimJim.Test.Model
 	[TestFixture]
 	public class SlnGenerationOptionsTests : TestBase
 	{
-		private SlnGenerationOptions options;
+		private SlnGenerationOptions _options;
 
 		[Test]
 		public void SolutionOutputPathDefaultsToProjectsRootPath()
 		{
-			options = new SlnGenerationOptions(GetSamplePath("Projects"));
+			_options = new SlnGenerationOptions(GetSamplePath("Projects"));
 
-			Assert.That(options.SlnOutputPath, Is.EqualTo(options.ProjectsRootDirectory));
+			Assert.That(_options.SlnOutputPath, Is.EqualTo(_options.ProjectsRootDirectory));
 		}
 
 		[Test]
 		public void SolutionOutputPathUsesGivenValueIfSet()
 		{
 			string slnOutputPath = GetSamplePath("Projects", "Solutions");
-			options = new SlnGenerationOptions(GetSamplePath("Projects")) {SlnOutputPath = slnOutputPath};
+			_options = new SlnGenerationOptions(GetSamplePath("Projects")) {SlnOutputPath = slnOutputPath};
 
-			Assert.That(options.SlnOutputPath, Is.EqualTo(slnOutputPath));
+			Assert.That(_options.SlnOutputPath, Is.EqualTo(slnOutputPath));
 		}
 
 		[Test]
 		public void UnspecifiedSolutionNameWithNoTargetProjectsUsesFolderName()
 		{
-			options = new SlnGenerationOptions(WorkingDirectory);
-			Assert.That(options.SolutionName, Is.EqualTo("WorkingDir"));
+			_options = new SlnGenerationOptions(WorkingDirectory);
+			Assert.That(_options.SolutionName, Is.EqualTo("WorkingDir"));
 
-			options = new SlnGenerationOptions(Path.Combine(WorkingDirectory, "SlumJim"));
-			Assert.That(options.SolutionName, Is.EqualTo("SlumJim"));
+			_options = new SlnGenerationOptions(Path.Combine(WorkingDirectory, "SlumJim"));
+			Assert.That(_options.SolutionName, Is.EqualTo("SlumJim"));
 
-			options = new SlnGenerationOptions(Path.Combine(WorkingDirectory, "SlumJim") + Path.DirectorySeparatorChar + Path.DirectorySeparatorChar);
-			Assert.That(options.SolutionName, Is.EqualTo("SlumJim"));
+			_options = new SlnGenerationOptions(Path.Combine(WorkingDirectory, "SlumJim") + Path.DirectorySeparatorChar + Path.DirectorySeparatorChar);
+			Assert.That(_options.SolutionName, Is.EqualTo("SlumJim"));
 
-			options = new SlnGenerationOptions(Path.DirectorySeparatorChar.ToString());
-			Assert.That(options.SolutionName, Is.EqualTo("SlimJim"));
+			_options = new SlnGenerationOptions(Path.DirectorySeparatorChar.ToString());
+			Assert.That(_options.SolutionName, Is.EqualTo("SlimJim"));
 		}
 
 		[Test]
 		public void AdditionalSearchPathsRootedAtProjectRoot()
 		{
 			var root = GetSamplePath ("Proj", "Root");
-			options = new SlnGenerationOptions(root);
+			_options = new SlnGenerationOptions(root);
 			var path1 = Path.Combine("..", "SearchPath");
 			var path2 = Path.Combine("..", "..", "OtherPath", "Pork");
-			options.AddAdditionalSearchPaths (path1, path2);
+			_options.AddAdditionalSearchPaths (path1, path2);
 
-			Assert.That(options.AdditionalSearchPaths, Is.EqualTo(new[] {Path.Combine(root, path1), Path.Combine(root, path2)}));
+			Assert.That(_options.AdditionalSearchPaths, Is.EqualTo(new[] {Path.Combine(root, path1), Path.Combine(root, path2)}));
 		}
 
 		[Test]
 		public void RelativeSlnOutputPathRootedAtProjectsRoot()
 		{
 			var root = GetSamplePath ("Proj", "Root");
-			options = new SlnGenerationOptions (root);
-			options.SlnOutputPath = "Solutions";
+			_options = new SlnGenerationOptions (root);
+			_options.SlnOutputPath = "Solutions";
 
-			Assert.That(options.SlnOutputPath, Is.EqualTo(Path.Combine(root, "Solutions")));
+			Assert.That(_options.SlnOutputPath, Is.EqualTo(Path.Combine(root, "Solutions")));
 		}
 
 		[Test]
 		public void RelativeProjectsRootDirIsRootedAtWorkingDir()
 		{
-			options = new SlnGenerationOptions(WorkingDirectory);
-			options.ProjectsRootDirectory = Path.Combine("Proj", "Root");
+			_options = new SlnGenerationOptions(WorkingDirectory);
+			_options.ProjectsRootDirectory = Path.Combine("Proj", "Root");
 
-			Assert.That(options.SlnOutputPath, Is.EqualTo (Path.Combine (WorkingDirectory, "Proj", "Root")));
+			Assert.That(_options.SlnOutputPath, Is.EqualTo (Path.Combine (WorkingDirectory, "Proj", "Root")));
 		}
 	}
 }

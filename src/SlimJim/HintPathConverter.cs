@@ -35,7 +35,7 @@ namespace SlimJim
 			var doc = LoadProject(project);
 			var nav = doc.CreateNavigator();
 
-			var nugetHintPaths = nav.Select("//msb:ItemGroup/msb:Reference/msb:HintPath", nsMgr)
+			var nugetHintPaths = nav.Select("//msb:ItemGroup/msb:Reference/msb:HintPath", NsMgr)
 				.Cast<XPathNavigator>()
 				.Where(e => e.Value.Contains(NuGetPackagesDirectoryName))
 				.ToList();
@@ -46,11 +46,11 @@ namespace SlimJim
 
 			if (nugetHintPaths.Any(e => e.Value.IndexOf(NuGetPackagesDirectoryName, StringComparison.InvariantCultureIgnoreCase) != firstIndex))
 			{
-				log.WarnFormat("Project {0} does not have consistent HintPath values for nuget packages. Skipping.", project.Path);
+				Log.WarnFormat("Project {0} does not have consistent HintPath values for nuget packages. Skipping.", project.Path);
 				return;
 			}
 
-			log.InfoFormat("Converting nuget hint paths in project {0}.", project.Path);
+			Log.InfoFormat("Converting nuget hint paths in project {0}.", project.Path);
 
 			var originalPackageDir = nugetHintPaths.First().Value.Substring(0, firstIndex + NuGetPackagesDirectoryName.Length);
 			string relativePackagesDir;
@@ -61,10 +61,10 @@ namespace SlimJim
 			}
 			else
 			{
-				var e = doc.SelectSingleNode("//msb:PropertyGroup/msb:SlimJimOriginalPackageDir", nsMgr);
+				var e = doc.SelectSingleNode("//msb:PropertyGroup/msb:SlimJimOriginalPackageDir", NsMgr);
 				if (e == null)
 				{
-					log.WarnFormat("Not restoring hint paths to project {0} because it does not have property SlimJimOriginalPackageDir defined.", project.Path);
+					Log.WarnFormat("Not restoring hint paths to project {0} because it does not have property SlimJimOriginalPackageDir defined.", project.Path);
 					return;
 				}
 				relativePackagesDir = e.InnerText;
@@ -74,15 +74,15 @@ namespace SlimJim
 			foreach (var hintPath in nugetHintPaths)
 			{
 				var modifiedHintPath = Path.Combine(relativePackagesDir, hintPath.Value.Substring(firstIndex + NuGetPackagesDirectoryName.Length));
-				log.DebugFormat("Change hint path from {0} to {1}", hintPath.Value, modifiedHintPath);
+				Log.DebugFormat("Change hint path from {0} to {1}", hintPath.Value, modifiedHintPath);
 				var element = CreateElementWithInnerText(doc, "HintPath", modifiedHintPath);
 				hintPath.ReplaceSelf(element.CreateNavigator());
 			}
 
 			if (mode == Mode.Convert)
 			{
-				var firstPropertyGroup = doc.SelectSingleNode("//msb:PropertyGroup[1]", nsMgr);
-				if (firstPropertyGroup.SelectSingleNode("msb:SlimJimOriginalPackageDir", nsMgr) == null)
+				var firstPropertyGroup = doc.SelectSingleNode("//msb:PropertyGroup[1]", NsMgr);
+				if (firstPropertyGroup.SelectSingleNode("msb:SlimJimOriginalPackageDir", NsMgr) == null)
 				{
 					firstPropertyGroup.AppendChild(CreateElementWithInnerText(doc, "SlimJimOriginalPackageDir",
 						originalPackageDir));

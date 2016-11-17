@@ -1,44 +1,62 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
+using EnvDTE80;
 using log4net;
 using Microsoft.Win32;
 using SlimJim.Model;
+using Process = System.Diagnostics.Process;
 
 namespace SlimJim.Infrastructure
 {
-	public class VisualStudioIntegration
-	{
-		private static readonly ILog Log = LogManager.GetLogger(typeof(SlnFileGenerator));
+    public static class VisualStudioIntegration
+    {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(SlnFileGenerator));
 
-		public static void OpenSolution(string solutionPath, VisualStudioVersion visualStudioVersion)
-		{
-			var devenvPath = FindDevEnv(visualStudioVersion);
+        public static void OpenSolution(string solutionPath, VisualStudioVersion visualStudioVersion)
+        {
+            var devenvPath = FindDevEnv(visualStudioVersion);
 
-			if (devenvPath == null || !File.Exists(devenvPath))
-			{
-				Log.ErrorFormat("Unable to locate Visual Studio {0} install directory.", visualStudioVersion.Year);
-				return;
-			}
+            if (devenvPath == null || !File.Exists(devenvPath))
+            {
+                Log.ErrorFormat("Unable to locate Visual Studio {0} install directory.", visualStudioVersion.Year);
+                return;
+            }
 
-			var info = new ProcessStartInfo(devenvPath, '"' + solutionPath + '"');
+            var info = new ProcessStartInfo(devenvPath, '"' + solutionPath + '"');
 
-			Process.Start(info);
-		}
+            Process.Start(info);
+        }
 
-		private static string FindDevEnv(VisualStudioVersion version)
-		{
-			string key = @"Software\Microsoft\VisualStudio\" + version.PathVersionNumber;
-			string wowKey = @"Software\Wow6432Node\Microsoft\VisualStudio\" + version.PathVersionNumber;
+        private static string FindDevEnv(VisualStudioVersion visualStudioVersion)
+        {
+            string key = @"Software\Microsoft\VisualStudio\" + visualStudioVersion.PathVersionNumber;
+            string wowKey = @"Software\Wow6432Node\Microsoft\VisualStudio\" + visualStudioVersion.PathVersionNumber;
 
-			var r = Registry.LocalMachine.OpenSubKey(wowKey) ?? Registry.LocalMachine.OpenSubKey(key);
+            var r = Registry.LocalMachine.OpenSubKey(wowKey) ?? Registry.LocalMachine.OpenSubKey(key);
 
-			if (r == null) return null;
+            var val = r?.GetValue("InstallDir");
 
-			var val = r.GetValue("InstallDir");
+            return val == null ? null : Path.Combine(val.ToString(), "devenv.exe");
+        }
 
-			return val == null ? null : Path.Combine(val.ToString(), "devenv.exe");
-		}
-	}
+        public static void LoadAndSaveSolutionInVS(string solutionPath, VisualStudioVersion visualStudioVersion)
+        {
+            if (visualStudioVersion.Year == "2015")
+            {
+                Log.Info($"Loading and Saving the Solution in Visual Studio {visualStudioVersion.Year}");
+                Type t = Type.GetTypeFromProgID("VisualStudio.DTE.14.0", true);
+                DTE2 dte = (DTE2)Activator.CreateInstance(t, true);
+
+                dte.Solution.Open(solutionPath);
+                dte.Solution.SaveAs(solutionPath);
+
+                dte.Quit();
+            }
+            else
+            {
+                Log.Error($"LoadAndSaveSolutionInVS is yet supported for Visual Studio {visualStudioVersion.Year}");
+            }
+        }
+    }
 }

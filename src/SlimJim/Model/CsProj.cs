@@ -16,14 +16,11 @@ namespace SlimJim.Model
 		public string TargetFrameworkVersion { get; set; }
 		public List<string> ReferencedAssemblyNames { get; set; }
 		public List<string> ReferencedProjectGuids { get; set; }
-		public bool UsesMSBuildPackageRestore { get; set; }
+		public bool UsesMsBuildPackageRestore { get; set; }
 
-		public string ProjectName
-		{
-			get { return System.IO.Path.GetFileNameWithoutExtension(Path); }
-		}
+		public string ProjectName => System.IO.Path.GetFileNameWithoutExtension(Path);
 
-		public void ReferencesAssemblies(params CsProj[] assemblyReferences)
+	    public void ReferencesAssemblies(params CsProj[] assemblyReferences)
 		{
 			foreach (CsProj reference in assemblyReferences)
 			{

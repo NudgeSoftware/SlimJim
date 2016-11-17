@@ -9,20 +9,20 @@ namespace SlimJim.Model
 	{
 		private static readonly ILog Log = LogManager.GetLogger(typeof(SlnFileGenerator));
 
-		private readonly List<CsProj> projectsList;
-		private Sln builtSln;
-		private static SlnBuilder overriddenBuilder;
-		private SlnGenerationOptions options;
+		private readonly List<CsProj> _projectsList;
+		private Sln _builtSln;
+		private static SlnBuilder _overriddenBuilder;
+		private SlnGenerationOptions _options;
 
 		public SlnBuilder(List<CsProj> projectsList)
 		{
-			this.projectsList = projectsList;
+			this._projectsList = projectsList;
 		}
 
 		public virtual Sln BuildSln(SlnGenerationOptions options)
 		{
-			this.options = options;
-			builtSln = new Sln(options.SolutionName)
+			this._options = options;
+			_builtSln = new Sln(options.SolutionName)
 				{
 					Version = options.VisualStudioVersion,
 					ProjectsRootDirectory = options.ProjectsRootDirectory
@@ -30,7 +30,7 @@ namespace SlimJim.Model
 
 			AddProjectsToSln(options);
 
-			return builtSln;
+			return _builtSln;
 		}
 
 		private void AddProjectsToSln(SlnGenerationOptions options)
@@ -69,7 +69,7 @@ namespace SlimJim.Model
 		{
 			Log.Info("Building full graph solution.");
 
-			projectsList.ForEach(AddProject);
+			_projectsList.ForEach(AddProject);
 		}
 
 		private CsProj AddAssemblySubtree(string assemblyName, string targetFrameworkVersion = "")
@@ -83,7 +83,7 @@ namespace SlimJim.Model
 
 		private CsProj FindProjectByAssemblyName(string assemblyName, string targetFrameworkVersion)
 		{
-			var matches = projectsList.Where(p => p.AssemblyName == assemblyName).ToList();
+			var matches = _projectsList.Where(p => p.AssemblyName == assemblyName).ToList();
 
 
 			if (matches.Count <= 1)
@@ -125,7 +125,7 @@ namespace SlimJim.Model
 
 				IncludeEfferentProjectReferences(project);
 
-				if (options.IncludeEfferentAssemblyReferences)
+				if (_options.IncludeEfferentAssemblyReferences)
 				{
 					IncludeEfferentAssemblyReferences(project);
 				}
@@ -134,7 +134,7 @@ namespace SlimJim.Model
 
 		private void AddProject(CsProj project)
 		{
-			builtSln.AddProjects(project);
+			_builtSln.AddProjects(project);
 		}
 
 		private void IncludeEfferentProjectReferences(CsProj project)
@@ -164,13 +164,13 @@ namespace SlimJim.Model
 		{
 			if (project != null)
 			{
-				List<CsProj> afferentAssemblyReferences = projectsList.FindAll(
+				List<CsProj> afferentAssemblyReferences = _projectsList.FindAll(
 					csp => csp.ReferencedAssemblyNames.Contains(project.AssemblyName));
 
 				AddAfferentReferences(afferentAssemblyReferences);
 
 				List<CsProj> afferentProjectReferences =
-					projectsList.FindAll(csp => csp.ReferencedProjectGuids.Contains(project.Guid));
+					_projectsList.FindAll(csp => csp.ReferencedProjectGuids.Contains(project.Guid));
 
 				AddAfferentReferences(afferentProjectReferences);
 			}
@@ -186,17 +186,17 @@ namespace SlimJim.Model
 
 		private CsProj FindProjectByProjectGuid(string projectGuid)
 		{
-			return projectsList.Find(csp => csp.Guid == projectGuid);
+			return _projectsList.Find(csp => csp.Guid == projectGuid);
 		}
 
 		public static SlnBuilder GetSlnBuilder(List<CsProj> projects)
 		{
-			return overriddenBuilder ?? new SlnBuilder(projects);
+			return _overriddenBuilder ?? new SlnBuilder(projects);
 		}
 
 		public static void OverrideDefaultBuilder(SlnBuilder slnBuilder)
 		{
-			overriddenBuilder = slnBuilder;
+			_overriddenBuilder = slnBuilder;
 		}
 	}
 }
