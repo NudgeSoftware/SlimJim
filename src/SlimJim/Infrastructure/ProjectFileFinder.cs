@@ -20,7 +20,7 @@ namespace SlimJim.Infrastructure
 
 		public virtual List<FileInfo> FindAllProjectFiles(string startPath)
 		{
-			Log.InfoFormat("Searching for .csproj files at {0}", startPath);
+			Log.InfoFormat("Searching for .c*proj files at {0}", startPath);
 
 			var root = new DirectoryInfo(startPath);
 			var projectFiles = GetProjectFiles(root);
@@ -43,7 +43,7 @@ namespace SlimJim.Infrastructure
 		private void SearchDirectoryForProjects(DirectoryInfo directory, List<FileInfo> files)
 		{
 			FileInfo[] projects = directory
-									.GetFiles("*.csproj")
+									.GetFiles("*.c*proj")
 									.Where(f => !PathIsIgnored(f.Name))
 									.ToArray();
 

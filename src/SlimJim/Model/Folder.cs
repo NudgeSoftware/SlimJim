@@ -21,7 +21,7 @@ namespace SlimJim.Model
 
 		public override string ToString()
 		{
-			return string.Format("FolderName: {0}", FolderName);
+			return $"FolderName: {FolderName}";
 		}
 	}
 }

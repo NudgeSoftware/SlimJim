@@ -47,8 +47,8 @@ namespace SlimJim.Model
 
 		public override string ToString()
 		{
-			return base.ToString() + 
-				string.Format(@" {{AssemblyName=""{0}"", Guid=""{1}"", Path=""{2}""}}", AssemblyName, Guid, Path);
+			return base.ToString() +
+			       $@" {{AssemblyName=""{AssemblyName}"", Guid=""{Guid}"", Path=""{Path}""}}";
 		}
 	}
 }

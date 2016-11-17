@@ -56,7 +56,7 @@ namespace SlimJim.Model
 
 		public override string ToString()
 		{
-			return string.Format("{0} ({1})", Year, SlnFileVersionNumber);
+			return $"{Year} ({SlnFileVersionNumber})";
 		}
 	}
 }

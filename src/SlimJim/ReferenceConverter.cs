@@ -57,7 +57,8 @@ namespace SlimJim
 			{
 				log.InfoFormat("Converting project {0} assembly reference {1} to project reference {2}.", project.AssemblyName, reference.AssemblyName, reference.Path);
 
-				var xpath = string.Format("//msb:ItemGroup/msb:Reference[substring-before(concat(@Include, ','), ',') = '{0}']", reference.AssemblyName);
+				var xpath =
+				    $"//msb:ItemGroup/msb:Reference[substring-before(concat(@Include, ','), ',') = '{reference.AssemblyName}']";
 
 				var element = nav.SelectSingleNode(xpath, nsMgr);
 
@@ -83,7 +84,7 @@ namespace SlimJim
 			doc.Save(project.Path);
 		}
 
-		private static XmlElement CreateElementWithInnerText(XmlDocument doc, string elementName, string text)
+		private new static XmlElement CreateElementWithInnerText(XmlDocument doc, string elementName, string text)
 		{
 			var e = doc.CreateElement(elementName, MSBuildXmlNamespace);
 			e.InnerText = text;
