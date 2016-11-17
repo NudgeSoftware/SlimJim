@@ -17,7 +17,7 @@ namespace SlimJim.Model
 		public Sln(string name, string guid)
 		{
 			Name = name;
-			Guid = guid;
+			Guid = guid.ToUpperInvariant();
 			Projects = new List<CsProj>();
 			Version = VisualStudioVersion.VS2010;
 		}
