@@ -27,7 +27,7 @@ namespace SlimJim.Infrastructure
 
 			return new CsProj
 			{
-				Path = csProjFile.FullName,
+				Path = GetRelativePath(csProjFile.FullName, Environment.CurrentDirectory),
 				AssemblyName = assemblyName.Value,
 				Guid = properties.Element(Ns + "ProjectGuid").ValueOrDefault()?.ToUpper(),
 				TargetFrameworkVersion = properties.Element(Ns + "TargetFrameworkVersion").ValueOrDefault(),
@@ -37,7 +37,21 @@ namespace SlimJim.Infrastructure
 			};
 		}
 
-		private XElement LoadXml(FileInfo csProjFile)
+        private string GetRelativePath(string filespec, string folder)
+        {
+            Uri pathUri = new Uri(filespec);
+
+            // Folders must end in a slash
+            if (!folder.EndsWith(Path.DirectorySeparatorChar.ToString()))
+            {
+                folder += Path.DirectorySeparatorChar;
+            }
+
+            Uri folderUri = new Uri(folder);
+            return Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString().Replace('/', Path.DirectorySeparatorChar));
+        }
+
+        private XElement LoadXml(FileInfo csProjFile)
 		{
 			XElement xml;
 			using (var reader = csProjFile.OpenText())
