@@ -17,7 +17,7 @@ namespace SlimJim.Test
 		private SlnBuilder _slnBuilder;
 		private SlnGenerationOptions _options;
 		private readonly List<CsProj> _projects = new List<CsProj>();
-		private readonly Sln _createdSlnObject = new Sln("Sln");
+		private readonly Sln _createdSlnObject = new Sln("Sln", new Guid().ToString("B"));
 
 		private string ProjectsDir => GetSamplePath ("Projects");
 

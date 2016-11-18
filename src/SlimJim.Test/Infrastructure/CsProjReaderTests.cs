@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using NUnit.Framework;
 using SlimJim.Infrastructure;
@@ -17,7 +18,7 @@ namespace SlimJim.Test.Infrastructure
 
 			Assert.That(project.Guid, Is.EqualTo("{4A37C916-5AA3-4C12-B7A8-E5F878A5CDBA}"));
 			Assert.That(project.AssemblyName, Is.EqualTo("MyProject"));
-			Assert.That(project.Path, Is.EqualTo(_file.FullName));
+			Assert.That(project.Path, Is.EqualTo(CsProjReader.GetRelativePath(_file.FullName, Environment.CurrentDirectory)));
 			Assert.That(project.TargetFrameworkVersion, Is.EqualTo("v4.0"));
 			Assert.That(project.ReferencedAssemblyNames, Is.EqualTo(new[]
 																   	{

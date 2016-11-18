@@ -1,6 +1,7 @@
-﻿Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
-
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyProject", "C:\Projects\MyProject\MyProject.csproj", "{E75347BE-2125-4325-818D-0ECC760F11BA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OurProject1", "C:\Projects\OurProject1\OurProject1.csproj", "{021CD387-7FE9-4BAD-B57F-6D8ABFE73562}"

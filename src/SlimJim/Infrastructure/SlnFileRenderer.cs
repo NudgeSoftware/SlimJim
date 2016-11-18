@@ -22,7 +22,7 @@ namespace SlimJim.Infrastructure
 		}
 		public SlnFileRenderer(Sln solution)
 		{
-			this._solution = solution;
+			_solution = solution;
 		}
 
 		public string Render()

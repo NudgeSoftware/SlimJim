@@ -16,9 +16,9 @@ namespace SlimJim.Test.Model.SlnBuilder
 		[Test]
 		public void SlnVersionEqualToVersionFromOptions()
 		{
-			Options.VisualStudioVersion = VisualStudioVersion.VS2008;
+			Options.VisualStudioVersion = VisualStudioVersion.VS2010;
 			GeneratePartialGraphSolution(new string[0]);
-			Assert.That(Solution.Version, Is.EqualTo(VisualStudioVersion.VS2008));
+			Assert.That(Solution.Version, Is.EqualTo(VisualStudioVersion.VS2010));
 		}
 
 		[Test]

@@ -9,17 +9,12 @@ namespace SlimJim.Model
 	{
 		private static readonly ILog Log = LogManager.GetLogger(typeof(Sln));
 
-		public Sln(string name)
-			:this(name, System.Guid.NewGuid().ToString("B"))
-		{
-		}
-
 		public Sln(string name, string guid)
 		{
 			Name = name;
 			Guid = guid.ToUpperInvariant();
 			Projects = new List<CsProj>();
-			Version = VisualStudioVersion.VS2010;
+			Version = VisualStudioVersion.VS2015;
 		}
 
 		private readonly IDictionary<string, Folder> _folders = new Dictionary<string, Folder>();

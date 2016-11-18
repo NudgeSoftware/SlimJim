@@ -11,7 +11,7 @@ namespace SlimJim.Infrastructure
 {
     public class ArgsOptionsBuilder
     {
-        private static ILog _log = LogManager.GetLogger(typeof (ArgsOptionsBuilder));
+        private static readonly ILog Log = LogManager.GetLogger(typeof (ArgsOptionsBuilder));
         private SlnGenerationOptions _options;
         private OptionSet _optionSet;
 
@@ -97,16 +97,16 @@ namespace SlimJim.Infrastructure
                 _optionSet.WriteOptionDescriptions(helpMessageWriter);
             }
 
-            _log.Info(helpMessage.ToString());
+            Log.Info(helpMessage.ToString());
         }
 
         private VisualStudioVersion TryParseVersionNumber(string versionNumber)
         {
-            VisualStudioVersion parsedVersion = VisualStudioVersion.ParseVersionString(versionNumber);
+            var parsedVersion = VisualStudioVersion.ParseVersionString(versionNumber);
 
             if (parsedVersion == null)
             {
-                parsedVersion = VisualStudioVersion.VS2010;
+                parsedVersion = VisualStudioVersion.VS2015;
             }
 
             return parsedVersion;

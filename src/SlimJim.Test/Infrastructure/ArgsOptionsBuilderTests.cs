@@ -71,14 +71,6 @@ namespace SlimJim.Test.Infrastructure
 		}
 
 		[Test]
-		public void SpecifiedVisualStudioVersion2008()
-		{
-			_options = ArgsOptionsBuilder.BuildOptions(new[] { "--version", "2008" }, WorkingDirectory);
-
-			Assert.That(_options.VisualStudioVersion, Is.EqualTo(VisualStudioVersion.VS2008));
-		}
-
-		[Test]
 		public void SpecifiedVisualStudioVersion2010()
 		{
 			_options = ArgsOptionsBuilder.BuildOptions(new[] { "--version", "2010" }, WorkingDirectory);

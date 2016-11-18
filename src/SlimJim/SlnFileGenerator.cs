@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -73,27 +72,11 @@ namespace SlimJim
 			Log.InfoFormat("Project References:\t{0}", options.ConvertReferences ? "Convert" : options.RestoreReferences ? "Restore" : "Do Nothing");
 			Log.InfoFormat("Hint Paths:\t\t{0}", options.FixHintPaths ? "Adjust" : options.RestoreReferences ? "Restore" : "Do Nothing");
 			Log.InfoFormat("Visual Studio Version:\t{0}", options.VisualStudioVersion);
-			Log.InfoFormat("Dinosaur:\t\t{0}", GetDinosaur());
 			Log.InfoFormat("----------------------------------------");
 			Log.InfoFormat("");
 		}
 
-		private string GetDinosaur()
-		{
-			var dinosaurNumber = DateTime.Now.Ticks % 3;
-
-			switch (dinosaurNumber)
-			{
-				case 0:
-					return "Tyranosaurus Rex";
-				case 1:
-					return "Triceratops";
-				default:
-					return "Giganotosaurus";
-			}
-		}
-
-		private string SummarizeTargetProjects(SlnGenerationOptions options)
+	    private string SummarizeTargetProjects(SlnGenerationOptions options)
 		{
 			var targets = string.Join(", ", options.TargetProjectNames);
 

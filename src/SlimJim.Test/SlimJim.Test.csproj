@@ -82,12 +82,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SlimJim\SlimJim.csproj">
-      <Project>{4A37C916-5AA3-4C12-B7A8-E5F878A5CDBA}</Project>
-      <Name>SlimJim</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="SampleFiles\CsProj\BreaksThings.csproj" />
     <Content Include="SampleFiles\CsProj\ConvertedReference.csproj" />
     <Content Include="SampleFiles\CsProj\NoProjectReferences.csproj" />
@@ -101,13 +95,17 @@
     <Content Include="SampleFiles\SampleFileSystem\Theirs\TheirProject1\TheirProject1.csproj" />
     <Content Include="SampleFiles\SampleFileSystem\Theirs\TheirProject2\TheirProject2.csproj" />
     <Content Include="SampleFiles\SampleFileSystem\Theirs\TheirProject3\TheirProject3.csproj" />
-    <Content Include="SampleFiles\Sln\VS2008.sln" />
     <Content Include="SampleFiles\Sln\ManyProjects.sln" />
     <Content Include="SampleFiles\Sln\ThreeProjects.sln" />
     <Content Include="SampleFiles\Sln\BlankSolution.sln" />
     <Content Include="SampleFiles\Sln\SingleProject.sln" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\SlimJim\SlimJim.csproj">
+      <Project>{4a37c916-5aa3-4c12-b7a8-e5f878a5cdba}</Project>
+      <Name>SlimJim</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

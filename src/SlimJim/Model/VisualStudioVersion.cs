@@ -5,7 +5,6 @@ namespace SlimJim.Model
 {
     public sealed class VisualStudioVersion
     {
-        private static readonly VisualStudioVersion vs2008 = new VisualStudioVersion("2008", "10.00", "9.0");
         private static readonly VisualStudioVersion vs2010 = new VisualStudioVersion("2010", "11.00", "10.0");
         private static readonly VisualStudioVersion vs2012 = new VisualStudioVersion("2012", "12.00", "12.0");
         private static readonly VisualStudioVersion vs2013 = new VisualStudioVersion("2013", "12.00", "13.0");
@@ -21,9 +20,7 @@ namespace SlimJim.Model
         public string Year { get; private set; }
         public string SlnFileVersionNumber { get; private set; }
         public string PathVersionNumber { get; private set; }
-        public string SlnVisualStudioVersion => PathVersionNumber.Split('.')[0];
-
-        public static VisualStudioVersion VS2008 => vs2008;
+		public string SlnVisualStudioVersion => PathVersionNumber.Split('.')[0];
 
         public static VisualStudioVersion VS2010 => vs2010;
 
@@ -35,7 +32,7 @@ namespace SlimJim.Model
 
         public static VisualStudioVersion ParseVersionString(string versionNumber)
         {
-            var versions = new[] { vs2008, vs2010, vs2012, vs2013, vs2015 };
+            var versions = new[] { vs2010, vs2012, vs2013, vs2015 };
 
             return versions.FirstOrDefault(v => versionNumber.Contains(v.Year)) ?? VS2015;
         }

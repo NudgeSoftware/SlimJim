@@ -52,15 +52,6 @@ namespace SlimJim.Test.Infrastructure
 			TestRender();
 		}
 
-		[Test]
-		public void VisualStudio2008Solution()
-		{
-			MakeSolution("VS2008");
-			_solution.Version = VisualStudioVersion.VS2008;
-
-			TestRender();
-		}
-
 		private void MakeSolution(string name, params CsProj[] csProjs)
 		{
 			_solution = new Sln(name, "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}");
@@ -71,7 +62,7 @@ namespace SlimJim.Test.Infrastructure
 		{
 			_renderer = new SlnFileRenderer(_solution);
 
-			string actualContents = _renderer.Render().Replace("\r\n", "\n").Replace("\n\n", "\n");
+		    string actualContents = _renderer.Render().Replace("\r\n", "\n").Replace("\n\n", "\n");
 			string expectedContents = SampleFileHelper.GetSlnFileContents(_solution.Name).Replace("\r\n", "\n").Replace("\n\n", "\n");
 
 			Assert.That(actualContents, Is.EqualTo(expectedContents));
