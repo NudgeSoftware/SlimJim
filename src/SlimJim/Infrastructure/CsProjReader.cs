@@ -28,11 +28,30 @@ namespace SlimJim.Infrastructure
                 Path = GetRelativePath(csProjFile.FullName, Environment.CurrentDirectory),
                 AssemblyName = assemblyName.Value,
                 Guid = properties.Element(Ns + "ProjectGuid").ValueOrDefault()?.ToUpper(),
+                ProjectTypeGuid = GetMainProjectTypeGuid(properties.Element(Ns + "ProjectTypeGuids").ValueOrDefault()),
                 TargetFrameworkVersion = properties.Element(Ns + "TargetFrameworkVersion").ValueOrDefault(),
                 ReferencedAssemblyNames = ReadReferencedAssemblyNames(xml),
                 ReferencedProjectGuids = ReadReferencedProjectGuids(xml, csProjFile),
                 UsesMsBuildPackageRestore = FindImportedNuGetTargets(xml)
             };
+        }
+
+        private static string GetMainProjectTypeGuid(string projectTypeGuidsString)
+        {
+            if (string.IsNullOrEmpty(projectTypeGuidsString))
+            {
+                return "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}";
+            }
+
+            var guids = projectTypeGuidsString.Split(';');
+
+            if (guids.Length == 1)
+            {
+                return guids.FirstOrDefault()?.ToUpperInvariant();
+            }
+
+
+            return guids[1].ToUpperInvariant();
         }
 
         public static string GetRelativePath(string absolutePath, string folder)
@@ -110,6 +129,6 @@ namespace SlimJim.Infrastructure
             var importPaths = (from import in xml.DescendantsAndSelf(Ns + "Import")
                                select import.Attribute("Project").Value);
             return importPaths.Any(p => p.EndsWith(@"\.nuget\nuget.targets", StringComparison.InvariantCultureIgnoreCase));
-        }    
+        }
     }
 }

@@ -25,25 +25,11 @@ namespace SlimJim.Model
         {
             _options = options;
 
-            var outputFile = Path.Combine(options.SlnOutputPath, $"{options.SolutionName}.sln");
-
-            var slnGuid = Guid.NewGuid();
-
-            if (File.Exists(outputFile))
+            _builtSln = new Sln(options.SolutionName)
             {
-                // grab sln GUID from existing sln file to reuse it so we have less churn on the sln file for
-                // the purposes of source control.  The regex will match all guids, the first one is the one we want.
-                var guidMatches = Regex.Match(File.ReadAllText(outputFile),
-                    @"[{(]?[0-9A-F]{8}[-]?([0-9A-F]{4}[-]?){3}[0-9A-F]{12}[)}]?");
-
-                slnGuid = Guid.Parse(guidMatches.Value);
-            }
-            
-            _builtSln = new Sln(options.SolutionName, slnGuid.ToString("B"))
-                {
-                    Version = options.VisualStudioVersion,
-                    ProjectsRootDirectory = options.ProjectsRootDirectory
-                };
+                Version = options.VisualStudioVersion,
+                ProjectsRootDirectory = options.ProjectsRootDirectory
+            };
 
             AddProjectsToSln(options);
 

@@ -2,7 +2,7 @@
 # Visual Studio $sln.Version.SlnVisualStudioVersion$
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-$sln.Projects:{ p | Project("$sln.Guid$") = "$p.AssemblyName$", "$p.Path$", "$p.Guid$"
+$sln.Projects:{ p | Project("$p.ProjectTypeGuid$") = "$p.AssemblyName$", "$p.Path$", "$p.Guid$"
 EndProject};separator="\r\n"$
 $if(sln.Folders)$
 $sln.Folders:{ f | Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "$f.FolderName$", "$f.FolderName$", "$f.Guid$"

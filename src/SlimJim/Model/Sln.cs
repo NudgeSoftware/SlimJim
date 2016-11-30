@@ -5,102 +5,107 @@ using log4net;
 
 namespace SlimJim.Model
 {
-	public class Sln
-	{
-		private static readonly ILog Log = LogManager.GetLogger(typeof(Sln));
+    public class Sln
+    {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(Sln));
 
-		public Sln(string name, string guid)
-		{
-			Name = name;
-			Guid = guid.ToUpperInvariant();
-			Projects = new List<CsProj>();
-			Version = VisualStudioVersion.VS2015;
-		}
+        public Sln(string name)
+            : this(name, System.Guid.NewGuid().ToString("B"))
+        {
+        }
 
-		private readonly IDictionary<string, Folder> _folders = new Dictionary<string, Folder>();
+        public Sln(string name, string guid)
+        {
+            Name = name;
+            Guid = guid.ToUpperInvariant();
+            Projects = new List<CsProj>();
+            Version = VisualStudioVersion.VS2015;
+        }
 
-		public string Name { get; private set; }
-		public string Guid { get; private set; }
-		public VisualStudioVersion Version { get; set; }
+        private readonly IDictionary<string, Folder> _folders = new Dictionary<string, Folder>();
 
-		private string _projectsRootDirectory;
-		public string ProjectsRootDirectory
-		{
-			get
-			{
-				return _projectsRootDirectory;
-			}
-			set
-			{
-				if (value != null && (value.EndsWith("/") || value.EndsWith(@"\")))
-				{
-					_projectsRootDirectory = value.Substring(0, value.Length - 1);
-				}
-				else
-				{
-					_projectsRootDirectory = value;
-				}
-			}
-		}
-		public List<CsProj> Projects { get; private set; }
+        public string Name { get; private set; }
+        public string Guid { get; private set; }
+        public VisualStudioVersion Version { get; set; }
 
-		public IEnumerable<Folder> Folders => _folders.Count > 0 ? _folders.Values : null;
+        private string _projectsRootDirectory;
+        public string ProjectsRootDirectory
+        {
+            get
+            {
+                return _projectsRootDirectory;
+            }
+            set
+            {
+                if (value != null && (value.EndsWith("/") || value.EndsWith(@"\")))
+                {
+                    _projectsRootDirectory = value.Substring(0, value.Length - 1);
+                }
+                else
+                {
+                    _projectsRootDirectory = value;
+                }
+            }
+        }
+        public List<CsProj> Projects { get; private set; }
 
-	    public void AddProjects(params CsProj[] csProjs)
-		{
-			foreach (CsProj proj in csProjs)
-			{
-				if (!Projects.Contains(proj))
-				{
-					Projects.Add(proj);
-					AddProjectToFolder(proj);
-				}
-			}
-		}
+        public IEnumerable<Folder> Folders => _folders.Count > 0 ? _folders.Values : null;
 
-		private void AddProjectToFolder(CsProj proj)
-		{
-			if (string.IsNullOrEmpty(ProjectsRootDirectory) || !proj.Path.StartsWith(ProjectsRootDirectory, StringComparison.InvariantCultureIgnoreCase))
-			{
-				return;
-			}
+        public void AddProjects(params CsProj[] csProjs)
+        {
+            foreach (CsProj proj in csProjs)
+            {
+                if (!Projects.Contains(proj))
+                {
+                    Projects.Add(proj);
+                    AddProjectToFolder(proj);
+                }
+            }
+        }
 
-			var relativeFolderPath = GetSolutionFolderPath(proj);
+        private void AddProjectToFolder(CsProj proj)
+        {
+            if (string.IsNullOrEmpty(ProjectsRootDirectory) || !proj.Path.StartsWith(ProjectsRootDirectory, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return;
+            }
 
-			if (string.IsNullOrEmpty(relativeFolderPath)) return;
+            var relativeFolderPath = GetSolutionFolderPath(proj);
 
-			var folder = GetOrCreateSolutionFolder(relativeFolderPath);
-			folder.AddContent(proj.Guid);
-		}
+            if (string.IsNullOrEmpty(relativeFolderPath)) return;
 
-		private string GetSolutionFolderPath(CsProj proj)
-		{
-			var relativeProjectPath = proj.Path.Substring(ProjectsRootDirectory.Length + 1);
+            var folder = GetOrCreateSolutionFolder(relativeFolderPath);
+            folder.AddContent(proj.Guid);
+        }
 
-			return Path.GetDirectoryName(Path.GetDirectoryName(relativeProjectPath));
-		}
+        private string GetSolutionFolderPath(CsProj proj)
+        {
+            var relativeProjectPath = proj.Path.Substring(ProjectsRootDirectory.Length + 1);
 
-		private Folder GetOrCreateSolutionFolder(string relativeFolderPath)
-		{
-			Folder folder;
+            return Path.GetDirectoryName(Path.GetDirectoryName(relativeProjectPath));
+        }
 
-			if (_folders.TryGetValue(relativeFolderPath, out folder)) return folder;
+        private Folder GetOrCreateSolutionFolder(string relativeFolderPath)
+        {
+            Folder folder;
 
-			Log.Debug("Creating solution folder for " + relativeFolderPath);
+            if (_folders.TryGetValue(relativeFolderPath, out folder)) return folder;
 
-			var newFolder = new Folder { FolderName = Path.GetFileName(relativeFolderPath), Guid = System.Guid.NewGuid().ToString("B") };
+            Log.Debug("Creating solution folder for " + relativeFolderPath);
 
-			var parentFolderPath = Path.GetDirectoryName(relativeFolderPath);
-			if (!string.IsNullOrEmpty(parentFolderPath))
-			{
-				var parentFolder = GetOrCreateSolutionFolder(parentFolderPath);
+            var newFolder = new Folder { FolderName = Path.GetFileName(relativeFolderPath), Guid = System.Guid.NewGuid().ToString("B") };
 
-				parentFolder.AddContent(newFolder.Guid);
-			}
+            var parentFolderPath = Path.GetDirectoryName(relativeFolderPath);
+            if (!string.IsNullOrEmpty(parentFolderPath))
+            {
+                var parentFolder = GetOrCreateSolutionFolder(parentFolderPath);
 
-			_folders[relativeFolderPath] = newFolder;
+                parentFolder.AddContent(newFolder.Guid);
+            }
 
-			return newFolder;
-		}
-	}
+            _folders[relativeFolderPath] = newFolder;
+
+            return newFolder;
+        }
+    }
 }
