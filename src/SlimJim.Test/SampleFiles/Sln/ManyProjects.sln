@@ -2,17 +2,17 @@
 # Visual Studio 15
 VisualStudioVersion = 15.0.26730.16
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyProject", "MyProject\MyProject.csproj", "{E75347BE-2125-4325-818D-0ECC760F11BA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyProject", "src\MyProject\MyProject.csproj", "{E75347BE-2125-4325-818D-0ECC760F11BA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OurProject1", "OurProject1\OurProject1.csproj", "{021CD387-7FE9-4BAD-B57F-6D8ABFE73562}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OurProject1", "src\OurProject1\OurProject1.csproj", "{021CD387-7FE9-4BAD-B57F-6D8ABFE73562}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OurProject2", "OurProject2\OurProject2.csproj", "{4A0CC937-5131-4B9F-AD9E-D6844BDD8EC3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OurProject2", "src\OurProject2\OurProject2.csproj", "{4A0CC937-5131-4B9F-AD9E-D6844BDD8EC3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheirProject1", "TheirProject1\TheirProject1.csproj", "{74CBCCEE-C805-49C3-9EB8-10B48CCC3A6F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheirProject1", "src\TheirProject1\TheirProject1.csproj", "{74CBCCEE-C805-49C3-9EB8-10B48CCC3A6F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheirProject2", "TheirProject2\TheirProject2.csproj", "{58E0EE99-9DCA-45C4-AB04-48D67316F71D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheirProject2", "src\TheirProject2\TheirProject2.csproj", "{58E0EE99-9DCA-45C4-AB04-48D67316F71D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheirProject3", "TheirProject3\TheirProject3.csproj", "{499372E5-5DBF-4DB4-BB1A-9072395C9017}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheirProject3", "src\TheirProject3\TheirProject3.csproj", "{499372E5-5DBF-4DB4-BB1A-9072395C9017}"
 EndProject
 
 Global

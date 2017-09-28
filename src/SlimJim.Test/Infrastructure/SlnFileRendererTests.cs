@@ -55,8 +55,13 @@ namespace SlimJim.Test.Infrastructure
 
         private void MakeSolution(string name, params CsProj[] csProjs)
         {
-            _solution = new Sln(name, "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}");
+            _solution = new Sln(name, "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}")
+            {
+                ProjectsRootDirectory = @"C:\Code\src"
+            };
+            
             _solution.AddProjects(csProjs);
+            
         }
 
         private void TestRender()
