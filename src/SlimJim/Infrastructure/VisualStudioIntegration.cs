@@ -42,7 +42,7 @@ namespace SlimJim.Infrastructure
 
         public static void LoadAndSaveSolutionInVS(string solutionPath, VisualStudioVersion visualStudioVersion)
         {
-            if (visualStudioVersion.Year == "2015")
+            if (visualStudioVersion.Year == "2015" || visualStudioVersion.Year == "2017")
             {
                 Log.Info($"Loading and Saving the Solution in Visual Studio {visualStudioVersion.Year}");
                 Type t = Type.GetTypeFromProgID("VisualStudio.DTE.14.0", true);

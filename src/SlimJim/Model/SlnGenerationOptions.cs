@@ -19,19 +19,16 @@ namespace SlimJim.Model
             _additionalSearchPaths = new List<string>();
             _ignoreDirectoryPatterns = new List<string>();
             TargetProjectNames = new List<string>();
-            VisualStudioVersion = VisualStudioVersion.VS2015;
+            VisualStudioVersion = VisualStudioVersion.VS2017;
             LoggingThreshold = Level.Info;
         }
 
-        public List<string> TargetProjectNames { get; private set; }
+        public List<string> TargetProjectNames { get; }
 
         public string ProjectsRootDirectory
         {
-            get { return _projectsRootDirectory; }
-            set
-            {
-                _projectsRootDirectory = ResolvePath(value);
-            }
+            get => _projectsRootDirectory;
+            set => _projectsRootDirectory = ResolvePath(value);
         }
 
         public VisualStudioVersion VisualStudioVersion { get; set; }
@@ -54,8 +51,8 @@ namespace SlimJim.Model
 
         public string SlnOutputPath
         {
-            get { return _slnOutputPath != null ? ResolvePath(_slnOutputPath) : ProjectsRootDirectory; }
-            set { _slnOutputPath = value; }
+            get => _slnOutputPath != null ? ResolvePath(_slnOutputPath) : ProjectsRootDirectory;
+            set => _slnOutputPath = value;
         }
 
         public string SolutionName
@@ -79,7 +76,7 @@ namespace SlimJim.Model
 
                 return _solutionName;
             }
-            set { _solutionName = value; }
+            set => _solutionName = value;
         }
 
         private string GetLastSegmentNameOfProjectsRootDirectory()

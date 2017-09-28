@@ -11,16 +11,16 @@ namespace SlimJim.Test.Model
         private readonly string slnGuid = new Guid().ToString("B");
         
         [Test]
-        public void VersionDefaultsTo2015()
+        public void VersionDefaultsTo2017()
         {
-            Assert.That(new Sln("sln", slnGuid).Version, Is.EqualTo(VisualStudioVersion.VS2015));
+            Assert.That(new Sln("sln", slnGuid).Version, Is.EqualTo(VisualStudioVersion.VS2017));
         }
 
         [Test]
         public void GuidFormatIncludesCurlyBraces()
         {
-            Assert.That(new Sln("sample", slnGuid).Guid, Is.StringStarting("{"));
-            Assert.That(new Sln("sample", slnGuid).Guid, Is.StringEnding("}"));
+            Assert.That(new Sln("sample", slnGuid).Guid, Does.StartWith("{"));
+            Assert.That(new Sln("sample", slnGuid).Guid, Does.EndWith("}"));
         }
 
         [Test]

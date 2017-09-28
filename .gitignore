@@ -18,3 +18,5 @@ TestResult.xml
 *.ncrunch*
 *.cache
 *.csproj?*
+
+/src/.vs/SlimJim/v15/sqlite3/storage.ide

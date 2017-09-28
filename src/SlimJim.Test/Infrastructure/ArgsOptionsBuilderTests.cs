@@ -48,7 +48,7 @@ namespace SlimJim.Test.Infrastructure
 			_options = ArgsOptionsBuilder.BuildOptions(new[] { "--target", "MyProject", "--target", "YourProject" }, WorkingDirectory);
 
 			Assert.That(_options.TargetProjectNames, Is.EqualTo(new[] { "MyProject", "YourProject" }));
-			Assert.That(_options.SolutionName, Is.StringMatching("MyProject_YourProject"));
+			Assert.That(_options.SolutionName, Does.Match("MyProject_YourProject"));
 		}
 
 		[Test]
@@ -83,7 +83,7 @@ namespace SlimJim.Test.Infrastructure
 		{
 			_options = ArgsOptionsBuilder.BuildOptions(new[] { "--version", "dumb" }, WorkingDirectory);
 
-			Assert.That(_options.VisualStudioVersion, Is.EqualTo(VisualStudioVersion.VS2015));
+			Assert.That(_options.VisualStudioVersion, Is.EqualTo(VisualStudioVersion.VS2017));
 		}
 
 		[Test]

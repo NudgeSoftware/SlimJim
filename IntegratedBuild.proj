@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 	<PropertyGroup>
-		<VersionPrefix>1.1.0</VersionPrefix>
+		<VersionPrefix>1.6.0</VersionPrefix>
 		<TestsEnabled>true</TestsEnabled>
 		<SolutionDir>$(MSBuildProjectDirectory)\src\</SolutionDir>
 	</PropertyGroup>
@@ -57,9 +57,9 @@
 
 	<Target Name="Test" Condition=" '$(TestsEnabled)' == 'true' ">
 		<ItemGroup>
-			<NUnitRunner Include="$(SolutionDir)packages\NUnit.Runners.*\tools\nunit-console.exe"/>
+			<NUnitRunner Include="$(SolutionDir)packages\NUnit.ConsoleRunner.*\tools\nunit-console.exe"/>
 		</ItemGroup>
-		<Error Text="No NUnit test runner package found in $(SolutionDir)packages." Condition=" '@(NUnitRunner)' == '' "/>
+		<Error Text="No NUnit test runner package found in $(SolutionDir)packages." Condition=" '@(NUnit.ConsoleRunner)' == '' "/>
 
 		<CreateProperty Value="&quot;%(NUnitRunner.Identity)&quot;" Condition=" '$(OS)' == 'Windows_NT' ">
 			<Output TaskParameter="Value" PropertyName="NUnitRunnerCommand"/>

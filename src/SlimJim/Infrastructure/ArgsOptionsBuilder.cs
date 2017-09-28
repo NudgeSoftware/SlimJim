@@ -106,7 +106,7 @@ namespace SlimJim.Infrastructure
 
             if (parsedVersion == null)
             {
-                parsedVersion = VisualStudioVersion.VS2015;
+                parsedVersion = VisualStudioVersion.VS2017;
             }
 
             return parsedVersion;

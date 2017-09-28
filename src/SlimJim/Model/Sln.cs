@@ -19,22 +19,19 @@ namespace SlimJim.Model
             Name = name;
             Guid = guid.ToUpperInvariant();
             Projects = new List<CsProj>();
-            Version = VisualStudioVersion.VS2015;
+            Version = VisualStudioVersion.VS2017;
         }
 
         private readonly IDictionary<string, Folder> _folders = new Dictionary<string, Folder>();
 
-        public string Name { get; private set; }
-        public string Guid { get; private set; }
+        public string Name { get; }
+        public string Guid { get; }
         public VisualStudioVersion Version { get; set; }
 
         private string _projectsRootDirectory;
         public string ProjectsRootDirectory
         {
-            get
-            {
-                return _projectsRootDirectory;
-            }
+            get => _projectsRootDirectory;
             set
             {
                 if (value != null && (value.EndsWith("/") || value.EndsWith(@"\")))
@@ -47,7 +44,7 @@ namespace SlimJim.Model
                 }
             }
         }
-        public List<CsProj> Projects { get; private set; }
+        public List<CsProj> Projects { get; }
 
         public IEnumerable<Folder> Folders => _folders.Count > 0 ? _folders.Values : null;
 
@@ -87,9 +84,7 @@ namespace SlimJim.Model
 
         private Folder GetOrCreateSolutionFolder(string relativeFolderPath)
         {
-            Folder folder;
-
-            if (_folders.TryGetValue(relativeFolderPath, out folder)) return folder;
+            if (_folders.TryGetValue(relativeFolderPath, out var folder)) return folder;
 
             Log.Debug("Creating solution folder for " + relativeFolderPath);
 
