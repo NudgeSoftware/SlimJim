@@ -57,7 +57,7 @@
 
 	<Target Name="Test" Condition=" '$(TestsEnabled)' == 'true' ">
 		<ItemGroup>
-			<NUnitRunner Include="$(SolutionDir)packages\NUnit.ConsoleRunner.*\tools\nunit-console.exe"/>
+			<NUnitRunner Include="$(SolutionDir)packages\NUnit.ConsoleRunner.*\tools\nunit3-console.exe"/>
 		</ItemGroup>
 		<Error Text="No NUnit test runner package found in $(SolutionDir)packages." Condition=" '@(NUnit.ConsoleRunner)' == '' "/>
 
@@ -72,7 +72,7 @@
 		<ItemGroup>
 			<TestAssembly Include="$(SolutionDir)*/bin/Debug/*Test*.dll"/>
 		</ItemGroup>
-		<Exec Command="$(NUnitRunnerCommand) @(TestAssembly -> '&quot;%(FullPath)&quot;', ' ') -noshadow"/>
+		<Exec Command="$(NUnitRunnerCommand) @(TestAssembly -> '&quot;%(FullPath)&quot;', ' ')"/>
 	</Target>
 
 	<Target Name="Package">
