@@ -22,7 +22,7 @@ namespace SlimJim.Infrastructure
             var assemblyName = properties?.Element(Ns + "AssemblyName");
 
             if (assemblyName == null) return null;
-
+            
             return new CsProj
             {
                 Path = GetRelativePath(csProjFile.FullName, Environment.CurrentDirectory),
@@ -32,7 +32,8 @@ namespace SlimJim.Infrastructure
                 TargetFrameworkVersion = properties.Element(Ns + "TargetFrameworkVersion").ValueOrDefault(),
                 ReferencedAssemblyNames = ReadReferencedAssemblyNames(xml),
                 ReferencedProjectGuids = ReadReferencedProjectGuids(xml, csProjFile),
-                UsesMsBuildPackageRestore = FindImportedNuGetTargets(xml)
+                UsesMsBuildPackageRestore = FindImportedNuGetTargets(xml),
+                Platform = FindPlatformTarget(xml)
             };
         }
 
@@ -129,6 +130,25 @@ namespace SlimJim.Infrastructure
             var importPaths = (from import in xml.DescendantsAndSelf(Ns + "Import")
                                select import.Attribute("Project").Value);
             return importPaths.Any(p => p.EndsWith(@"\.nuget\nuget.targets", StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        private string FindPlatformTarget(XElement xml)
+        {
+            var propGroups = from propGroup in xml.DescendantsAndSelf(Ns + "PropertyGroup")
+                select propGroup;
+
+            var propertyGroupList = propGroups as IList<XElement> ?? propGroups.ToList();
+
+            foreach (var propGroup in propertyGroupList)
+            {
+                var platformTarget = from x in propGroup.DescendantsAndSelf(Ns + "PlatformTarget")
+                    select x;
+
+                var platformTargets = platformTarget as IList<XElement> ?? platformTarget.ToList();
+                if (platformTargets.Any() && !string.IsNullOrWhiteSpace(platformTargets.First().Value)) return platformTargets.First().Value;
+            }
+
+            return "Any CPU";
         }
     }
 }

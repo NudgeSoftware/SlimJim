@@ -1,6 +1,6 @@
 ﻿Microsoft Visual Studio Solution File, Format Version $sln.Version.SlnFileVersionNumber$
 # Visual Studio $sln.Version.SlnVisualStudioVersion$
-VisualStudioVersion = 15.0.26730.16
+VisualStudioVersion = 15.0.27130.0
 MinimumVisualStudioVersion = 10.0.40219.1
 $sln.Projects:{ p | Project("$p.ProjectTypeGuid$") = "$p.AssemblyName$", "$p.Path$", "$p.Guid$"
 EndProject};separator="\r\n"$
@@ -18,10 +18,10 @@ $if(sln.Projects)$
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 	$sln.Projects:{ p |
-	$p.Guid$.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-	$p.Guid$.Debug|Any CPU.Build.0 = Debug|Any CPU
-	$p.Guid$.Release|Any CPU.ActiveCfg = Release|Any CPU
-	$p.Guid$.Release|Any CPU.Build.0 = Release|Any CPU};separator="\r\n"$
+	$p.Guid$.Debug|Any CPU.ActiveCfg = Debug|$p.Platform$
+	$p.Guid$.Debug|Any CPU.Build.0 = Debug|$p.Platform$
+	$p.Guid$.Release|Any CPU.ActiveCfg = Release|$p.Platform$
+	$p.Guid$.Release|Any CPU.Build.0 = Release|$p.Platform$};separator="\r\n"$
 	EndGlobalSection
 
 $endif$

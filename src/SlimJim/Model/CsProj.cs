@@ -18,6 +18,7 @@ namespace SlimJim.Model
         public List<string> ReferencedAssemblyNames { get; set; }
         public List<string> ReferencedProjectGuids { get; set; }
         public bool UsesMsBuildPackageRestore { get; set; }
+        public string Platform { get; set; } = "Any CPU";
 
         public string ProjectName => System.IO.Path.GetFileNameWithoutExtension(Path);
 
