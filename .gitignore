@@ -20,4 +20,3 @@ TestResult.xml
 *.csproj?*
 
 /src/.vs/SlimJim/v15/sqlite3/storage.ide
-/src/.vs/
