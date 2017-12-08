@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace SlimJim.Model
 {
     public class CsProj
     {
+        public const string AnyCPU = "Any CPU";
+
         public CsProj()
         {
             ReferencedAssemblyNames = new List<string>();
-            //            ReferencedProjectGuids = new List<string>();
             ReferencedProjects = new List<(string assemblyName, string guid)>();
         }
 
@@ -19,9 +19,8 @@ namespace SlimJim.Model
         public string AssemblyName { get; set; }
         public string TargetFrameworkVersion { get; set; }
         public List<string> ReferencedAssemblyNames { get; set; }
-        //public List<string> ReferencedProjectGuids { get; set; }
         public List<(string assemblyName, string guid)> ReferencedProjects { get; set; }
-        public string Platform { get; set; } = "Any CPU";
+        public string Platform { get; set; } = AnyCPU;
 
         public string ProjectName => System.IO.Path.GetFileNameWithoutExtension(Path);
 

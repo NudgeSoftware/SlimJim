@@ -12,14 +12,14 @@ namespace SlimJim.Infrastructure
     public class CsProjReader
     {
         private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private static readonly XNamespace Ns = "http://schemas.microsoft.com/developer/msbuild/2003";
+        private static readonly XNamespace LegacyNs = "http://schemas.microsoft.com/developer/msbuild/2003";
 
         public virtual CsProj Read(FileInfo csProjFile)
         {
             var xml = LoadXml(csProjFile);
-            var properties = xml.Element(Ns + "PropertyGroup");
+            var properties = xml.Element(LegacyNs + "PropertyGroup");
 
-            var assemblyName = properties?.Element(Ns + "AssemblyName");
+            var assemblyName = properties?.Element(LegacyNs + "AssemblyName");
 
             if (assemblyName != null)
             {
@@ -27,17 +27,17 @@ namespace SlimJim.Infrastructure
                 {
                     Path = GetRelativePath(csProjFile.FullName, Environment.CurrentDirectory),
                     AssemblyName = assemblyName.Value,
-                    Guid = properties.Element(Ns + "ProjectGuid").ValueOrDefault()?.ToUpper(),
-                    ProjectTypeGuid = GetMainProjectTypeGuid(properties.Element(Ns + "ProjectTypeGuids").ValueOrDefault()),
-                    TargetFrameworkVersion = properties.Element(Ns + "TargetFrameworkVersion").ValueOrDefault(),
+                    Guid = properties.Element(LegacyNs + "ProjectGuid").ValueOrDefault()?.ToUpper(),
+                    ProjectTypeGuid = GetMainProjectTypeGuid(properties.Element(LegacyNs + "ProjectTypeGuids").ValueOrDefault()),
+                    TargetFrameworkVersion = properties.Element(LegacyNs + "TargetFrameworkVersion").ValueOrDefault(),
                     ReferencedAssemblyNames = ReadReferencedAssemblyNames(xml),
                     ReferencedProjects = ReadLegacyProjectReferences(xml, csProjFile),
-                    Platform = FindPlatformTarget(xml)
+                    Platform = FindPlatformTargetLegacy(xml)
                 };
             }
 
             // new CsProj format
-            var t = new CsProj
+            return new CsProj
             {
                 Path = GetRelativePath(csProjFile.FullName, Environment.CurrentDirectory),
                 AssemblyName = csProjFile.Name.Replace(".csproj", string.Empty),
@@ -46,8 +46,6 @@ namespace SlimJim.Infrastructure
                 ReferencedProjects = ReadNewProjectReferences(xml),
                 Platform = FindPlatformTarget(xml)
             };
-
-            return t;
         }
 
         private static string GetMainProjectTypeGuid(string projectTypeGuidsString)
@@ -94,8 +92,8 @@ namespace SlimJim.Infrastructure
 
         private List<string> ReadReferencedAssemblyNames(XElement xml)
         {
-            var rawAssemblyNames = (from r in xml.DescendantsAndSelf(Ns + "Reference")
-                                    where r.Parent?.Name == Ns + "ItemGroup"
+            var rawAssemblyNames = (from r in xml.DescendantsAndSelf(LegacyNs + "Reference")
+                                    where r.Parent?.Name == LegacyNs + "ItemGroup"
                                     select r.Attribute("Include")?.Value).ToList();
             var unQualifiedAssemblyNames = rawAssemblyNames.ConvertAll(UnQualify);
             return unQualifiedAssemblyNames;
@@ -110,7 +108,7 @@ namespace SlimJim.Infrastructure
 
         private List<(string projectInclude, string Guid)> ReadLegacyProjectReferences(XElement xml, FileInfo csProjFile)
         {
-            return (from pr in xml.DescendantsAndSelf(Ns + "ProjectReference")
+            return (from pr in xml.DescendantsAndSelf(LegacyNs + "ProjectReference")
                     select (GetProjectNameFromPath(pr), ReadProjectGuid(pr, csProjFile))).ToList();
         }
 
@@ -129,20 +127,20 @@ namespace SlimJim.Infrastructure
 
         private string ReadProjectGuid(XElement projectReference, FileInfo csprojFile)
         {
-            var project = projectReference.Element(Ns + "Project");
+            var project = projectReference.Element(LegacyNs + "Project");
             if (project == null)
             {
-                Log.WarnFormat("No project Guid for {0}. Fixing...", projectReference.Element(Ns + "Name")?.Value);
+                Log.WarnFormat("No project Guid for {0}. Fixing...", projectReference.Element(LegacyNs + "Name")?.Value);
                 var filename = projectReference.Attribute("Include")?.Value;
                 if (filename == null)
                 {
                     Log.WarnFormat("No Include= attribute for project {0}.",
-                        projectReference.Element(Ns + "Name")?.Value);
+                        projectReference.Element(LegacyNs + "Name")?.Value);
                     return null;
                 }
                 filename = Path.Combine(csprojFile.Directory?.FullName ?? throw new InvalidOperationException(), filename);
                 var projectFile = LoadXml(new FileInfo(filename));
-                var projectGuid = projectFile?.Element("PropertyGroup")?.Element(Ns + "ProjectGuid");
+                var projectGuid = projectFile?.Element("PropertyGroup")?.Element(LegacyNs + "ProjectGuid");
                 if (projectGuid == null)
                 {
                     Log.WarnFormat("ProjectGuid not found in {0}", filename);
@@ -154,7 +152,26 @@ namespace SlimJim.Infrastructure
             return project.Value.ToUpper();
         }
 
-        private string FindPlatformTarget(XElement xml)
+        private static string FindPlatformTargetLegacy(XElement xml)
+        {
+            var propGroups = from propGroup in xml.DescendantsAndSelf(LegacyNs + "PropertyGroup")
+                             select propGroup;
+
+            var propertyGroupList = propGroups as IList<XElement> ?? propGroups.ToList();
+
+            foreach (var propGroup in propertyGroupList)
+            {
+                var platformTarget = from x in propGroup.DescendantsAndSelf(LegacyNs + "PlatformTarget")
+                                     select x;
+
+                var platformTargets = platformTarget as IList<XElement> ?? platformTarget.ToList();
+                if (platformTargets.Any() && !string.IsNullOrWhiteSpace(platformTargets.First().Value)) return platformTargets.First().Value;
+            }
+
+            return CsProj.AnyCPU;
+        }
+
+        private static string FindPlatformTarget(XElement xml)
         {
             var propGroups = from propGroup in xml.DescendantsAndSelf("PropertyGroup")
                              select propGroup;
@@ -170,7 +187,7 @@ namespace SlimJim.Infrastructure
                 if (platformTargets.Any() && !string.IsNullOrWhiteSpace(platformTargets.First().Value)) return platformTargets.First().Value;
             }
 
-            return "Any CPU";
+            return CsProj.AnyCPU;
         }
     }
 }

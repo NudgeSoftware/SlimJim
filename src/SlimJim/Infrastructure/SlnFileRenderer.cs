@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Reflection;
 using SlimJim.Model;
 using Antlr3.ST;
 
@@ -17,7 +16,7 @@ namespace SlimJim.Infrastructure
 			TemplateGroup = new StringTemplateGroup("SlnTemplates");
 			using (stream)
 			{
-				TemplateGroup.DefineTemplate("SolutionTemplate", new StreamReader(stream).ReadToEnd());
+				TemplateGroup.DefineTemplate("SolutionTemplate", new StreamReader(stream ?? throw new InvalidOperationException()).ReadToEnd());
 			}
 		}
 		public SlnFileRenderer(Sln solution)
