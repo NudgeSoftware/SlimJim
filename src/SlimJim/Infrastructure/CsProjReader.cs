@@ -21,26 +21,40 @@ namespace SlimJim.Infrastructure
 
             var assemblyName = properties?.Element(Ns + "AssemblyName");
 
-            if (assemblyName == null) return null;
-            
-            return new CsProj
+            if (assemblyName != null)
+            {
+                return new CsProj
+                {
+                    Path = GetRelativePath(csProjFile.FullName, Environment.CurrentDirectory),
+                    AssemblyName = assemblyName.Value,
+                    Guid = properties.Element(Ns + "ProjectGuid").ValueOrDefault()?.ToUpper(),
+                    ProjectTypeGuid = GetMainProjectTypeGuid(properties.Element(Ns + "ProjectTypeGuids").ValueOrDefault()),
+                    TargetFrameworkVersion = properties.Element(Ns + "TargetFrameworkVersion").ValueOrDefault(),
+                    ReferencedAssemblyNames = ReadReferencedAssemblyNames(xml),
+                    ReferencedProjects = ReadLegacyProjectReferences(xml, csProjFile),
+                    Platform = FindPlatformTarget(xml)
+                };
+            }
+
+            // new CsProj format
+            var t = new CsProj
             {
                 Path = GetRelativePath(csProjFile.FullName, Environment.CurrentDirectory),
-                AssemblyName = assemblyName.Value,
-                Guid = properties.Element(Ns + "ProjectGuid").ValueOrDefault()?.ToUpper(),
-                ProjectTypeGuid = GetMainProjectTypeGuid(properties.Element(Ns + "ProjectTypeGuids").ValueOrDefault()),
-                TargetFrameworkVersion = properties.Element(Ns + "TargetFrameworkVersion").ValueOrDefault(),
-                ReferencedAssemblyNames = ReadReferencedAssemblyNames(xml),
-                ReferencedProjectGuids = ReadReferencedProjectGuids(xml, csProjFile),
-                UsesMsBuildPackageRestore = FindImportedNuGetTargets(xml),
+                AssemblyName = csProjFile.Name.Replace(".csproj", string.Empty),
+                ProjectTypeGuid = GetMainProjectTypeGuid(string.Empty),
+                Guid = Guid.Empty.ToString(), // will be filled in later once we find what it is from other projects that reference it
+                ReferencedProjects = ReadNewProjectReferences(xml),
                 Platform = FindPlatformTarget(xml)
             };
+
+            return t;
         }
 
         private static string GetMainProjectTypeGuid(string projectTypeGuidsString)
         {
             if (string.IsNullOrEmpty(projectTypeGuidsString))
             {
+                // Default to C# Project Type Guid
                 return "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}";
             }
 
@@ -81,8 +95,8 @@ namespace SlimJim.Infrastructure
         private List<string> ReadReferencedAssemblyNames(XElement xml)
         {
             var rawAssemblyNames = (from r in xml.DescendantsAndSelf(Ns + "Reference")
-                                    where r.Parent.Name == Ns + "ItemGroup"
-                                    select r.Attribute("Include").Value).ToList();
+                                    where r.Parent?.Name == Ns + "ItemGroup"
+                                    select r.Attribute("Include")?.Value).ToList();
             var unQualifiedAssemblyNames = rawAssemblyNames.ConvertAll(UnQualify);
             return unQualifiedAssemblyNames;
         }
@@ -91,13 +105,26 @@ namespace SlimJim.Infrastructure
         {
             if (!name.Contains(",")) return name;
 
-            return name.Substring(0, name.IndexOf(","));
+            return name.Substring(0, name.IndexOf(",", StringComparison.Ordinal));
         }
 
-        private List<string> ReadReferencedProjectGuids(XElement xml, FileInfo csprojFile)
+        private List<(string projectInclude, string Guid)> ReadLegacyProjectReferences(XElement xml, FileInfo csProjFile)
         {
             return (from pr in xml.DescendantsAndSelf(Ns + "ProjectReference")
-                    select ReadProjectGuid(pr, csprojFile)).ToList();
+                    select (GetProjectNameFromPath(pr), ReadProjectGuid(pr, csProjFile))).ToList();
+        }
+
+        private static string GetProjectNameFromPath(XElement pr)
+        {
+            var file = new FileInfo(pr.Attribute("Include")?.Value ?? throw new InvalidOperationException());
+
+            return file.Name.Replace(".csproj", string.Empty);
+        }
+
+        private List<(string projectInclude, string Guid)> ReadNewProjectReferences(XElement xml)
+        {
+            return (from pr in xml.DescendantsAndSelf("ProjectReference")
+                    select (GetProjectNameFromPath(pr), Guid.Empty.ToString())).ToList();
         }
 
         private string ReadProjectGuid(XElement projectReference, FileInfo csprojFile)
@@ -105,16 +132,17 @@ namespace SlimJim.Infrastructure
             var project = projectReference.Element(Ns + "Project");
             if (project == null)
             {
-                Log.WarnFormat("No project Guid for {0}. Fixing...", projectReference.Element(Ns + "Name").Value);
+                Log.WarnFormat("No project Guid for {0}. Fixing...", projectReference.Element(Ns + "Name")?.Value);
                 var filename = projectReference.Attribute("Include")?.Value;
                 if (filename == null)
                 {
-                    Log.WarnFormat("No Include= attribute for project {0}.", projectReference.Element(Ns + "Name").Value);
+                    Log.WarnFormat("No Include= attribute for project {0}.",
+                        projectReference.Element(Ns + "Name")?.Value);
                     return null;
                 }
-                filename = Path.Combine(csprojFile.Directory.FullName, filename);
+                filename = Path.Combine(csprojFile.Directory?.FullName ?? throw new InvalidOperationException(), filename);
                 var projectFile = LoadXml(new FileInfo(filename));
-                var projectGuid = projectFile?.Element(Ns + "PropertyGroup")?.Element(Ns + "ProjectGuid");
+                var projectGuid = projectFile?.Element("PropertyGroup")?.Element(Ns + "ProjectGuid");
                 if (projectGuid == null)
                 {
                     Log.WarnFormat("ProjectGuid not found in {0}", filename);
@@ -122,27 +150,21 @@ namespace SlimJim.Infrastructure
                 }
                 return projectGuid.Value.ToUpper();
             }
-            return project.Value.ToUpper();
-        }
 
-        private bool FindImportedNuGetTargets(XElement xml)
-        {
-            var importPaths = (from import in xml.DescendantsAndSelf(Ns + "Import")
-                               select import.Attribute("Project").Value);
-            return importPaths.Any(p => p.EndsWith(@"\.nuget\nuget.targets", StringComparison.InvariantCultureIgnoreCase));
+            return project.Value.ToUpper();
         }
 
         private string FindPlatformTarget(XElement xml)
         {
-            var propGroups = from propGroup in xml.DescendantsAndSelf(Ns + "PropertyGroup")
-                select propGroup;
+            var propGroups = from propGroup in xml.DescendantsAndSelf("PropertyGroup")
+                             select propGroup;
 
             var propertyGroupList = propGroups as IList<XElement> ?? propGroups.ToList();
 
             foreach (var propGroup in propertyGroupList)
             {
-                var platformTarget = from x in propGroup.DescendantsAndSelf(Ns + "PlatformTarget")
-                    select x;
+                var platformTarget = from x in propGroup.DescendantsAndSelf("PlatformTarget")
+                                     select x;
 
                 var platformTargets = platformTarget as IList<XElement> ?? platformTarget.ToList();
                 if (platformTargets.Any() && !string.IsNullOrWhiteSpace(platformTargets.First().Value)) return platformTargets.First().Value;

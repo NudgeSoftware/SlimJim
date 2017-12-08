@@ -30,10 +30,10 @@ namespace SlimJim.Test.Infrastructure
 																							"System.Data",
 																							"System.Xml"
 																   	}));
-			Assert.That(project.ReferencedProjectGuids, Is.EqualTo(new[]
+			Assert.That(project.ReferencedProjects, Is.EqualTo(new[]
 																  	{
-																							"{99036BB6-4F97-4FCC-AF6C-0345A5089099}",
-																							"{69036BB3-4F97-4F9C-AF2C-0349A5049060}"
+																	      ("MyApp.Core", "{99036BB6-4F97-4FCC-AF6C-0345A5089099}"),
+																	      ("MyOtherProject", "{69036BB3-4F97-4F9C-AF2C-0349A5049060}")                                                                                            
 																  	}));
 		}
 
@@ -58,15 +58,7 @@ namespace SlimJim.Test.Infrastructure
 		{
 			CsProj project = GetProject("NoProjectReferences");
 
-			Assert.That(project.ReferencedProjectGuids, Is.Empty);
-		}
-
-		[Test]
-		public void NoAssemblyName_ReturnsNull()
-		{
-			CsProj project = GetProject("BreaksThings");
-
-			Assert.That(project, Is.Null);
+			Assert.That(project.ReferencedProjects, Is.Empty);
 		}
 
 		private CsProj GetProject(string fileName)

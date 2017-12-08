@@ -1,10 +1,15 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30110.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlimJim", "SlimJim\SlimJim.csproj", "{4A37C916-5AA3-4C12-B7A8-E5F878A5CDBA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlimJim.Test", "SlimJim.Test\SlimJim.Test.csproj", "{F28F7DCF-30E4-40DF-9FCF-FFFA17ECBA7F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8C1DFC04-8182-45D3-BB99-64E01380EDB4}"
+	ProjectSection(SolutionItems) = preProject
+		..\IntegratedBuild.proj = ..\IntegratedBuild.proj
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,5 +44,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C076743C-DFD0-4D43-9929-14B1055FE106}
 	EndGlobalSection
 EndGlobal

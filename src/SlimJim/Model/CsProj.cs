@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SlimJim.Model
 {
@@ -7,7 +9,8 @@ namespace SlimJim.Model
         public CsProj()
         {
             ReferencedAssemblyNames = new List<string>();
-            ReferencedProjectGuids = new List<string>();
+            //            ReferencedProjectGuids = new List<string>();
+            ReferencedProjects = new List<(string assemblyName, string guid)>();
         }
 
         public string Guid { get; set; }
@@ -16,8 +19,8 @@ namespace SlimJim.Model
         public string AssemblyName { get; set; }
         public string TargetFrameworkVersion { get; set; }
         public List<string> ReferencedAssemblyNames { get; set; }
-        public List<string> ReferencedProjectGuids { get; set; }
-        public bool UsesMsBuildPackageRestore { get; set; }
+        //public List<string> ReferencedProjectGuids { get; set; }
+        public List<(string assemblyName, string guid)> ReferencedProjects { get; set; }
         public string Platform { get; set; } = "Any CPU";
 
         public string ProjectName => System.IO.Path.GetFileNameWithoutExtension(Path);
@@ -37,9 +40,9 @@ namespace SlimJim.Model
         {
             foreach (CsProj reference in projectReferences)
             {
-                if (!ReferencedProjectGuids.Contains(reference.Guid))
+                if (!ReferencedProjects.Select(tuple => tuple.guid).Contains(reference.Guid))
                 {
-                    ReferencedProjectGuids.Add(reference.Guid);
+                    ReferencedProjects.Add((reference.AssemblyName, reference.Guid));
                 }
             }
         }

@@ -45,21 +45,7 @@ namespace SlimJim
 				new HintPathConverter().RestoreHintPaths(solution, options);
 			}
 
-			WarnOnMissingNuGetTargets(projects, options);
-
 			return SlnWriter.WriteSlnFile(solution, options.SlnOutputPath).FullName;
-		}
-
-		private void WarnOnMissingNuGetTargets(List<CsProj> projects, SlnGenerationOptions options)
-		{
-			var nugetTargetsPath = Path.Combine(options.SlnOutputPath, ".nuget", "nuget.targets");
-			if (projects.Any(p => p.UsesMsBuildPackageRestore) && !File.Exists(nugetTargetsPath))
-			{
-				Log.WarnFormat(
-					"One or more of the projects included use MSBuild-based NuGet package restore. " +
-					"To ensure these projects build correctly from the generated solution, copy nuget.targets " +
-					"from the solution to {0}.", nugetTargetsPath);
-			}
 		}
 
 		private void LogSummary(SlnGenerationOptions options)
