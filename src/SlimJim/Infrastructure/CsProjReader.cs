@@ -41,7 +41,7 @@ namespace SlimJim.Infrastructure
             {
                 Path = GetRelativePath(csProjFile.FullName, Environment.CurrentDirectory),
                 AssemblyName = csProjFile.Name.Replace(".csproj", string.Empty),
-                ProjectTypeGuid = GetMainProjectTypeGuid(string.Empty),
+                ProjectTypeGuid = GetMainProjectTypeGuid("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}"),
                 Guid = Guid.Empty.ToString(), // will be filled in later once we find what it is from other projects that reference it
                 ReferencedProjects = ReadNewProjectReferences(xml),
                 Platform = FindPlatformTarget(xml)
@@ -52,7 +52,7 @@ namespace SlimJim.Infrastructure
         {
             if (string.IsNullOrEmpty(projectTypeGuidsString))
             {
-                // Default to C# Project Type Guid
+                // Default to legacy csproj Guid
                 return "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}";
             }
 
