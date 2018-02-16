@@ -57,7 +57,7 @@ namespace SlimJim.Infrastructure
                 if (project.Guid == Guid.Empty.ToString())
                 {
                     var projectWithReference = projects.Find(proj =>
-                        proj.ReferencedProjects.Select(tuple => tuple.assemblyName)
+                        proj.ReferencedProjects.Where(tuple => tuple.guid != Guid.Empty.ToString()) .Select(tuple => tuple.assemblyName)
                             .FirstOrDefault(s => s.Equals(project.AssemblyName)) != null);
 
                     if (projectWithReference != null)
