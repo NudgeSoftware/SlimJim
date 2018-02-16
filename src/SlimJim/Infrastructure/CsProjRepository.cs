@@ -21,8 +21,9 @@ namespace SlimJim.Infrastructure
         {
             IgnoreConfiguredDirectoryPatterns(options);
 
-            List<FileInfo> files = FindAllProjectFiles(options);
-            List<CsProj> projects = ReadProjectFilesIntoCsProjObjects(files);
+            var files = FindAllProjectFiles(options);
+            var projects = PopulateTopLevelProjectGuids(files);
+            projects = PopulateProjectReferenceGuids(projects);
 
             return projects;
         }
@@ -37,7 +38,7 @@ namespace SlimJim.Infrastructure
 
         private List<FileInfo> FindAllProjectFiles(SlnGenerationOptions options)
         {
-            List<FileInfo> files = Finder.FindAllProjectFiles(options.ProjectsRootDirectory);
+            var files = Finder.FindAllProjectFiles(options.ProjectsRootDirectory);
 
             foreach (string path in options.AdditionalSearchPaths)
             {
@@ -47,9 +48,9 @@ namespace SlimJim.Infrastructure
             return files;
         }
 
-        private List<CsProj> ReadProjectFilesIntoCsProjObjects(List<FileInfo> files)
+        private List<CsProj> PopulateTopLevelProjectGuids(List<FileInfo> files)
         {
-            List<CsProj> projects = files.ConvertAll(f => Reader.Read(f));
+            var projects = files.ConvertAll(f => Reader.Read(f));
             projects.RemoveAll(p => p == null);
 
             foreach (var project in projects)
@@ -57,14 +58,34 @@ namespace SlimJim.Infrastructure
                 if (project.Guid == Guid.Empty.ToString())
                 {
                     var projectWithReference = projects.Find(proj =>
-                        proj.ReferencedProjects.Where(tuple => tuple.guid != Guid.Empty.ToString()) .Select(tuple => tuple.assemblyName)
+                        proj.ReferencedProjects.Where(tuple => tuple.Value != Guid.Empty.ToString()) .Select(tuple => tuple.Key)
                             .FirstOrDefault(s => s.Equals(project.AssemblyName)) != null);
 
                     if (projectWithReference != null)
                     {
-                        project.Guid = projectWithReference.ReferencedProjects.Find(tuple => tuple.assemblyName == project.AssemblyName).guid;
+                        project.Guid = projectWithReference.ReferencedProjects[project.AssemblyName];
                     }
                 }
+            }
+
+            return projects;
+        }
+
+        private List<CsProj> PopulateProjectReferenceGuids(List<CsProj> projects)
+        {
+            foreach (var project in projects)
+            {
+                var copiedReferences = new Dictionary<string, string>(project.ReferencedProjects);
+
+                foreach (var reference in project.ReferencedProjects)
+                {
+                    if (reference.Value == Guid.Empty.ToString())
+                    {
+                        copiedReferences[reference.Key] = projects.Find(proj => proj.AssemblyName == reference.Key).Guid;
+                    }
+                }
+
+                project.ReferencedProjects = copiedReferences;
             }
 
             return projects;

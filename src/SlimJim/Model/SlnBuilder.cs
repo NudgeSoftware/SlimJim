@@ -142,7 +142,7 @@ namespace SlimJim.Model
         {
             foreach (var referencedProj in project.ReferencedProjects)
             {
-                AddProjectSubtree(referencedProj.guid);
+                AddProjectSubtree(referencedProj.Value);
             }
         }
 
@@ -171,7 +171,7 @@ namespace SlimJim.Model
                 AddAfferentReferences(afferentAssemblyReferences);
 
                 List<CsProj> afferentProjectReferences =
-                    _projectsList.FindAll(csp => csp.ReferencedProjects.Select(tuple => tuple.guid).Contains(project.Guid));
+                    _projectsList.FindAll(csp => csp.ReferencedProjects.Select(tuple => tuple.Value).Contains(project.Guid));
 
                 AddAfferentReferences(afferentProjectReferences);
             }

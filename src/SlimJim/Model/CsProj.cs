@@ -10,7 +10,7 @@ namespace SlimJim.Model
         public CsProj()
         {
             ReferencedAssemblyNames = new List<string>();
-            ReferencedProjects = new List<(string assemblyName, string guid)>();
+            ReferencedProjects = new Dictionary<string, string>();
         }
 
         public string Guid { get; set; }
@@ -19,7 +19,7 @@ namespace SlimJim.Model
         public string AssemblyName { get; set; }
         public string TargetFrameworkVersion { get; set; }
         public List<string> ReferencedAssemblyNames { get; set; }
-        public List<(string assemblyName, string guid)> ReferencedProjects { get; set; }
+        public Dictionary<string, string> ReferencedProjects { get; set; }
         public string Platform { get; set; } = AnyCPU;
 
         public string ProjectName => System.IO.Path.GetFileNameWithoutExtension(Path);
@@ -39,9 +39,9 @@ namespace SlimJim.Model
         {
             foreach (CsProj reference in projectReferences)
             {
-                if (!ReferencedProjects.Select(tuple => tuple.guid).Contains(reference.Guid))
+                if (!ReferencedProjects.Select(tuple => tuple.Value).Contains(reference.Guid))
                 {
-                    ReferencedProjects.Add((reference.AssemblyName, reference.Guid));
+                    ReferencedProjects.Add(reference.AssemblyName, reference.Guid);
                 }
             }
         }

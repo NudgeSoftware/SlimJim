@@ -106,10 +106,10 @@ namespace SlimJim.Infrastructure
             return name.Substring(0, name.IndexOf(",", StringComparison.Ordinal));
         }
 
-        private List<(string projectInclude, string Guid)> ReadLegacyProjectReferences(XElement xml, FileInfo csProjFile)
+        private Dictionary<string, string> ReadLegacyProjectReferences(XElement xml, FileInfo csProjFile)
         {
             return (from pr in xml.DescendantsAndSelf(LegacyNs + "ProjectReference")
-                    select (GetProjectNameFromPath(pr), ReadProjectGuid(pr, csProjFile))).ToList();
+                    select (GetProjectNameFromPath(pr), ReadProjectGuid(pr, csProjFile))).ToDictionary(tuple => tuple.Item1, tuple => tuple.Item2);
         }
 
         private static string GetProjectNameFromPath(XElement pr)
@@ -119,10 +119,11 @@ namespace SlimJim.Infrastructure
             return file.Name.Replace(".csproj", string.Empty);
         }
 
-        private List<(string projectInclude, string Guid)> ReadNewProjectReferences(XElement xml)
+        private Dictionary<string, string> ReadNewProjectReferences(XElement xml)
         {
+            // Guid will be populated later
             return (from pr in xml.DescendantsAndSelf("ProjectReference")
-                    select (GetProjectNameFromPath(pr), Guid.Empty.ToString())).ToList();
+                    select (GetProjectNameFromPath(pr), Guid.Empty.ToString())).ToDictionary(tuple => tuple.Item1, tuple => tuple.Item2);
         }
 
         private string ReadProjectGuid(XElement projectReference, FileInfo csprojFile)
