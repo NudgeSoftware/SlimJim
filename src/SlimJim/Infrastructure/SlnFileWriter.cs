@@ -6,51 +6,48 @@ using SlimJim.Model;
 
 namespace SlimJim.Infrastructure
 {
-	public class SlnFileWriter
-	{
-		private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+    public class SlnFileWriter
+    {
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-		public virtual FileInfo WriteSlnFile(Sln solution, string writeInDirectory)
-		{
-			var outputFile = new FileInfo(GetOutputFilePath(writeInDirectory, solution));
+        public virtual FileInfo WriteSlnFile(Sln solution, string writeInDirectory)
+        {
+            var outputFile = new FileInfo(GetOutputFilePath(writeInDirectory, solution));
 
-			if (!outputFile.Directory.Exists)
-			{
-				outputFile.Directory.Create();
-			}
+            if (!outputFile.Directory.Exists) outputFile.Directory.Create();
 
-			var renderer = new SlnFileRenderer(solution);
-			var fileContents = renderer.Render();
+            var renderer = new SlnFileRenderer(solution);
+            var fileContents = renderer.Render();
 
-			if (outputFile.Exists && ContentsUnmodified(outputFile, fileContents))
-			{
-				Log.Info("Solution file is unmodified from previous generation.");
-				return outputFile;
-			}
+            if (outputFile.Exists && ContentsUnmodified(outputFile, fileContents))
+            {
+                Log.Info("Solution file is unmodified from previous generation.");
+                return outputFile;
+            }
 
-			using (var writer = new StreamWriter(outputFile.Open(FileMode.Create)))
-			{
-				writer.Write(fileContents);
-			}
+            using (var writer = new StreamWriter(outputFile.Open(FileMode.Create)))
+            {
+                writer.Write(fileContents);
+            }
 
-			Log.Info("Solution file written to " + outputFile.FullName);
+            Log.Info("Solution file written to " + outputFile.FullName);
 
-			return outputFile;
-		}
+            return outputFile;
+        }
 
-		private bool ContentsUnmodified(FileInfo outputFile, string fileContents)
-		{
-			var previousContents = File.ReadAllText(outputFile.FullName);
-			
-			fileContents = Regex.Replace(fileContents, @"Project\(.+\)", "Project");
-			previousContents = Regex.Replace(previousContents, @"Project\(.+\)", "Project");
+        private bool ContentsUnmodified(FileInfo outputFile, string fileContents)
+        {
+            var previousContents = File.ReadAllText(outputFile.FullName);
 
-			return fileContents == previousContents;
-		}
+            fileContents = Regex.Replace(fileContents, @"Project\(.+\)", "Project");
+            previousContents = Regex.Replace(previousContents, @"Project\(.+\)", "Project");
 
-		private string GetOutputFilePath(string writeInDirectory, Sln solution)
-		{
-			return Path.Combine(writeInDirectory, solution.Name + ".sln");
-		}
-	}
+            return fileContents == previousContents;
+        }
+
+        private string GetOutputFilePath(string writeInDirectory, Sln solution)
+        {
+            return Path.Combine(writeInDirectory, solution.Name + ".sln");
+        }
+    }
 }

@@ -7,63 +7,63 @@ using SlimJim.Model;
 
 namespace SlimJim.Test
 {
-	[TestFixture]
-	public class SlnFileGeneratorTests : TestBase
-	{
-		private const string TargetProject = "MyProject";
-		private SlnFileGenerator _gen;
-		private SlnFileWriter _slnWriter;
-		private CsProjRepository _repo;
-		private SlnBuilder _slnBuilder;
-		private SlnGenerationOptions _options;
-		private readonly List<CsProj> _projects = new List<CsProj>();
-		private readonly Sln _createdSlnObject = new Sln("Sln", new Guid().ToString("B"));
+    [TestFixture]
+    public class SlnFileGeneratorTests : TestBase
+    {
+        [SetUp]
+        public void BeforeEach()
+        {
+            _repo = MockRepository.GenerateStrictMock<CsProjRepository>();
+            _slnWriter = MockRepository.GenerateStrictMock<SlnFileWriter>();
+            _slnBuilder = MockRepository.GenerateStrictMock<SlnBuilder>(new List<CsProj>());
 
-		private string ProjectsDir => GetSamplePath ("Projects");
+            _gen = new SlnFileGenerator
+            {
+                ProjectRepository = _repo,
+                SlnWriter = _slnWriter
+            };
 
-	    [SetUp]
-		public void BeforeEach()
-		{
-			_repo = MockRepository.GenerateStrictMock<CsProjRepository>();
-			_slnWriter = MockRepository.GenerateStrictMock<SlnFileWriter>();
-			_slnBuilder = MockRepository.GenerateStrictMock<SlnBuilder>(new List<CsProj>());
+            SlnBuilder.OverrideDefaultBuilder(_slnBuilder);
+            _options = new SlnGenerationOptions(ProjectsDir);
+        }
 
-			_gen = new SlnFileGenerator()
-			{
-				ProjectRepository = _repo,
-				SlnWriter = _slnWriter
-			};
+        [TearDown]
+        public void AfterEach()
+        {
+            _repo.VerifyAllExpectations();
+            _slnWriter.VerifyAllExpectations();
+            _slnBuilder.VerifyAllExpectations();
+        }
 
-			SlnBuilder.OverrideDefaultBuilder(_slnBuilder);
-			_options = new SlnGenerationOptions(ProjectsDir);
-		}
+        private const string TargetProject = "MyProject";
+        private SlnFileGenerator _gen;
+        private SlnFileWriter _slnWriter;
+        private CsProjRepository _repo;
+        private SlnBuilder _slnBuilder;
+        private SlnGenerationOptions _options;
+        private readonly List<CsProj> _projects = new List<CsProj>();
+        private readonly Sln _createdSlnObject = new Sln("Sln", new Guid().ToString("B"));
 
-		[Test]
-		public void CreatesOwnInstancesOfRepositoryAndWriter()
-		{
-			_gen = new SlnFileGenerator();
-			Assert.That(_gen.ProjectRepository, Is.Not.Null, "Should have created instance of CsProjRepository.");
-			Assert.That(_gen.SlnWriter, Is.Not.Null, "Should have created instance of SlnFileWriter.");
-		}
+        private string ProjectsDir => GetSamplePath("Projects");
 
-		[Test]
-		public void GeneratesSlnFileForGivenOptions()
-		{
-			_options.TargetProjectNames.Add(TargetProject);
+        [Test]
+        public void CreatesOwnInstancesOfRepositoryAndWriter()
+        {
+            _gen = new SlnFileGenerator();
+            Assert.That(_gen.ProjectRepository, Is.Not.Null, "Should have created instance of CsProjRepository.");
+            Assert.That(_gen.SlnWriter, Is.Not.Null, "Should have created instance of SlnFileWriter.");
+        }
 
-			_repo.Expect(r => r.LookupCsProjsFromDirectory(_options)).Return(_projects);
-			_slnBuilder.Expect(bld => bld.BuildSln(_options)).Return(_createdSlnObject);
-			_slnWriter.Expect(wr => wr.WriteSlnFile(_createdSlnObject, ProjectsDir));
+        [Test]
+        public void GeneratesSlnFileForGivenOptions()
+        {
+            _options.TargetProjectNames.Add(TargetProject);
 
-			_gen.GenerateSolutionFile(_options);
-		}
+            _repo.Expect(r => r.LookupCsProjsFromDirectory(_options)).Return(_projects);
+            _slnBuilder.Expect(bld => bld.BuildSln(_options)).Return(_createdSlnObject);
+            _slnWriter.Expect(wr => wr.WriteSlnFile(_createdSlnObject, ProjectsDir));
 
-		[TearDown]
-		public void AfterEach()
-		{
-			_repo.VerifyAllExpectations();
-			_slnWriter.VerifyAllExpectations();
-			_slnBuilder.VerifyAllExpectations();
-		}
-	}
+            _gen.GenerateSolutionFile(_options);
+        }
+    }
 }

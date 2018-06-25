@@ -3,92 +3,93 @@ using System.Linq;
 using System.Xml;
 using System.Xml.XPath;
 using SlimJim.Model;
-using log4net;
 
 namespace SlimJim
 {
-	public class ReferenceConverter : CsProjConverter
-	{
-		public void ConvertToProjectReferences(Sln solution)
-		{
-			var projectsByName = solution.Projects.ToDictionary(p => p.AssemblyName, p => p);
+    public class ReferenceConverter : CsProjConverter
+    {
+        public void ConvertToProjectReferences(Sln solution)
+        {
+            var projectsByName = solution.Projects.ToDictionary(p => p.AssemblyName, p => p);
 
-			foreach (var project in solution.Projects)
-			{
-				var assemblyNamesInSolution = project.ReferencedAssemblyNames.Intersect(projectsByName.Keys).ToArray();
-				
-				if (assemblyNamesInSolution.Length == 0) continue;
+            foreach (var project in solution.Projects)
+            {
+                var assemblyNamesInSolution = project.ReferencedAssemblyNames.Intersect(projectsByName.Keys).ToArray();
 
-				ConvertToProjectReference(project, assemblyNamesInSolution.Select(a => projectsByName[a]));
-			}
-		}
+                if (assemblyNamesInSolution.Length == 0) continue;
 
-		public void RestoreAssemblyReferences(Sln solution)
-		{
-			foreach (var project in solution.Projects)
-			{
-				RestoreAssemblyReferencesInProject(project);
-			}
-		}
+                ConvertToProjectReference(project, assemblyNamesInSolution.Select(a => projectsByName[a]));
+            }
+        }
 
-		private void RestoreAssemblyReferencesInProject(CsProj project)
-		{
-			var doc = LoadProject(project);
-			var nav = doc.CreateNavigator();
+        public void RestoreAssemblyReferences(Sln solution)
+        {
+            foreach (var project in solution.Projects) RestoreAssemblyReferencesInProject(project);
+        }
 
-			XPathNavigator projectReference;
+        private void RestoreAssemblyReferencesInProject(CsProj project)
+        {
+            var doc = LoadProject(project);
+            var nav = doc.CreateNavigator();
 
-			while ((projectReference = nav.SelectSingleNode("//msb:ProjectReference[msb:SlimJimReplacedReference and 1]", NsMgr)) != null)
-			{
-				var original = projectReference.SelectSingleNode("./msb:SlimJimReplacedReference/msb:Reference", NsMgr);
-				Log.InfoFormat("Restoring project {0} assembly reference to {1}", project.ProjectName, projectReference.GetAttribute("Include", ""));
-				projectReference.ReplaceSelf(original);
-			}
+            XPathNavigator projectReference;
 
-			doc.Save(project.Path);
-		}
+            while ((projectReference =
+                       nav.SelectSingleNode("//msb:ProjectReference[msb:SlimJimReplacedReference and 1]", NsMgr)) !=
+                   null)
+            {
+                var original = projectReference.SelectSingleNode("./msb:SlimJimReplacedReference/msb:Reference", NsMgr);
+                Log.InfoFormat("Restoring project {0} assembly reference to {1}", project.ProjectName,
+                    projectReference.GetAttribute("Include", ""));
+                projectReference.ReplaceSelf(original);
+            }
 
-		private void ConvertToProjectReference(CsProj project, IEnumerable<CsProj> references)
-		{
-			var doc = LoadProject(project);
-			var nav = doc.CreateNavigator();
+            doc.Save(project.Path);
+        }
 
-			foreach (var reference in references)
-			{
-				Log.InfoFormat("Converting project {0} assembly reference {1} to project reference {2}.", project.AssemblyName, reference.AssemblyName, reference.Path);
+        private void ConvertToProjectReference(CsProj project, IEnumerable<CsProj> references)
+        {
+            var doc = LoadProject(project);
+            var nav = doc.CreateNavigator();
 
-				var xpath =
-				    $"//msb:ItemGroup/msb:Reference[substring-before(concat(@Include, ','), ',') = '{reference.AssemblyName}']";
+            foreach (var reference in references)
+            {
+                Log.InfoFormat("Converting project {0} assembly reference {1} to project reference {2}.",
+                    project.AssemblyName, reference.AssemblyName, reference.Path);
 
-				var element = nav.SelectSingleNode(xpath, NsMgr);
+                var xpath =
+                    $"//msb:ItemGroup/msb:Reference[substring-before(concat(@Include, ','), ',') = '{reference.AssemblyName}']";
 
-				if (element == null)
-				{
-					Log.ErrorFormat("Failed to locate Reference element in {0} for assembly {1}.", project.Path, reference.AssemblyName);
-					continue;
-				}
+                var element = nav.SelectSingleNode(xpath, NsMgr);
 
-				var projectReference = doc.CreateElement("ProjectReference", MsBuildXmlNamespace);
-				projectReference.SetAttribute("Include", reference.Path);
-				projectReference.AppendChild(CreateElementWithInnerText(doc, "Project", reference.Guid));
-				projectReference.AppendChild(CreateElementWithInnerText(doc, "Name", reference.ProjectName));
+                if (element == null)
+                {
+                    Log.ErrorFormat("Failed to locate Reference element in {0} for assembly {1}.", project.Path,
+                        reference.AssemblyName);
+                    continue;
+                }
 
-				var wrapper = doc.CreateElement("SlimJimReplacedReference", MsBuildXmlNamespace);
-				wrapper.AppendChild(((XmlNode) element.UnderlyingObject).Clone());
+                var projectReference = doc.CreateElement("ProjectReference", MsBuildXmlNamespace);
+                projectReference.SetAttribute("Include", reference.Path);
+                projectReference.AppendChild(CreateElementWithInnerText(doc, "Project", reference.Guid));
+                projectReference.AppendChild(CreateElementWithInnerText(doc, "Name", reference.ProjectName));
 
-				projectReference.AppendChild(wrapper);
+                var wrapper = doc.CreateElement("SlimJimReplacedReference", MsBuildXmlNamespace);
+                wrapper.AppendChild(((XmlNode) element.UnderlyingObject).Clone());
 
-				element.ReplaceSelf(new XmlNodeReader(projectReference));
-			}
+                projectReference.AppendChild(wrapper);
 
-			doc.Save(project.Path);
-		}
+                element.ReplaceSelf(new XmlNodeReader(projectReference));
+            }
 
-		private new static XmlElement CreateElementWithInnerText(XmlDocument doc, string elementName, string text)
-		{
-			var e = doc.CreateElement(elementName, MsBuildXmlNamespace);
-			e.InnerText = text;
-			return e;
-		}
-	}
+            doc.Save(project.Path);
+        }
+
+        private new static XmlElement CreateElementWithInnerText(XmlDocument doc, string elementName, string text)
+        {
+            var e = doc.CreateElement(elementName, MsBuildXmlNamespace);
+            e.InnerText = text;
+            return e;
+        }
+    }
 }

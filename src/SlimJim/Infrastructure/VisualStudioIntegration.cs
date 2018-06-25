@@ -5,7 +5,6 @@ using EnvDTE80;
 using log4net;
 using Microsoft.Win32;
 using SlimJim.Model;
-using Process = System.Diagnostics.Process;
 
 namespace SlimJim.Infrastructure
 {
@@ -30,8 +29,8 @@ namespace SlimJim.Infrastructure
 
         private static string FindDevEnv(VisualStudioVersion visualStudioVersion)
         {
-            string key = @"Software\Microsoft\VisualStudio\" + visualStudioVersion.PathVersionNumber;
-            string wowKey = @"Software\Wow6432Node\Microsoft\VisualStudio\" + visualStudioVersion.PathVersionNumber;
+            var key = @"Software\Microsoft\VisualStudio\" + visualStudioVersion.PathVersionNumber;
+            var wowKey = @"Software\Wow6432Node\Microsoft\VisualStudio\" + visualStudioVersion.PathVersionNumber;
 
             var r = Registry.LocalMachine.OpenSubKey(wowKey) ?? Registry.LocalMachine.OpenSubKey(key);
 
@@ -45,8 +44,8 @@ namespace SlimJim.Infrastructure
             if (visualStudioVersion.Year == "2015" || visualStudioVersion.Year == "2017")
             {
                 Log.Info($"Loading and Saving the Solution in Visual Studio {visualStudioVersion.Year}");
-                Type t = Type.GetTypeFromProgID("VisualStudio.DTE.14.0", true);
-                DTE2 dte = (DTE2)Activator.CreateInstance(t, true);
+                var t = Type.GetTypeFromProgID("VisualStudio.DTE.14.0", true);
+                var dte = (DTE2) Activator.CreateInstance(t, true);
 
                 dte.Solution.Open(solutionPath);
                 dte.Solution.SaveAs(solutionPath);

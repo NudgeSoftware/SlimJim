@@ -17,6 +17,9 @@ namespace SlimJim.Infrastructure
             Reader = new CsProjReader();
         }
 
+        public ProjectFileFinder Finder { get; set; }
+        public CsProjReader Reader { get; set; }
+
         public virtual List<CsProj> LookupCsProjsFromDirectory(SlnGenerationOptions options)
         {
             IgnoreConfiguredDirectoryPatterns(options);
@@ -31,19 +34,14 @@ namespace SlimJim.Infrastructure
         private void IgnoreConfiguredDirectoryPatterns(SlnGenerationOptions options)
         {
             if (options.IgnoreDirectoryPatterns.Count > 0)
-            {
                 Finder.IgnorePatterns(options.IgnoreDirectoryPatterns.ToArray());
-            }
         }
 
         private List<FileInfo> FindAllProjectFiles(SlnGenerationOptions options)
         {
             var files = Finder.FindAllProjectFiles(options.ProjectsRootDirectory);
 
-            foreach (string path in options.AdditionalSearchPaths)
-            {
-                files.AddRange(Finder.FindAllProjectFiles(path));
-            }
+            foreach (var path in options.AdditionalSearchPaths) files.AddRange(Finder.FindAllProjectFiles(path));
 
             return files;
         }
@@ -54,19 +52,16 @@ namespace SlimJim.Infrastructure
             projects.RemoveAll(p => p == null);
 
             foreach (var project in projects)
-            {
                 if (project.Guid == Guid.Empty.ToString())
                 {
                     var projectWithReference = projects.Find(proj =>
-                        proj.ReferencedProjects.Where(tuple => tuple.Value != Guid.Empty.ToString()) .Select(tuple => tuple.Key)
+                        proj.ReferencedProjects.Where(tuple => tuple.Value != Guid.Empty.ToString())
+                            .Select(tuple => tuple.Key)
                             .FirstOrDefault(s => s.Equals(project.AssemblyName)) != null);
 
                     if (projectWithReference != null)
-                    {
                         project.Guid = projectWithReference.ReferencedProjects[project.AssemblyName];
-                    }
                 }
-            }
 
             return projects;
         }
@@ -78,20 +73,14 @@ namespace SlimJim.Infrastructure
                 var copiedReferences = new Dictionary<string, string>(project.ReferencedProjects);
 
                 foreach (var reference in project.ReferencedProjects)
-                {
                     if (reference.Value == Guid.Empty.ToString())
-                    {
-                        copiedReferences[reference.Key] = projects.Find(proj => proj.AssemblyName == reference.Key).Guid;
-                    }
-                }
+                        copiedReferences[reference.Key] =
+                            projects.Find(proj => proj.AssemblyName == reference.Key).Guid;
 
                 project.ReferencedProjects = copiedReferences;
             }
 
             return projects;
         }
-
-        public ProjectFileFinder Finder { get; set; }
-        public CsProjReader Reader { get; set; }
     }
 }

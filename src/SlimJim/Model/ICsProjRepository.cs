@@ -2,8 +2,8 @@
 
 namespace SlimJim.Model
 {
-	public interface ICsProjRepository
-	{
-		List<CsProj> LookupCsProjsFromDirectory(SlnGenerationOptions options);
-	}
+    public interface ICsProjRepository
+    {
+        List<CsProj> LookupCsProjsFromDirectory(SlnGenerationOptions options);
+    }
 }

@@ -14,7 +14,7 @@ namespace SlimJim.Model
         public string Year { get; }
         public string SlnFileVersionNumber { get; }
         public string PathVersionNumber { get; }
-		public string SlnVisualStudioVersion => PathVersionNumber.Split('.')[0];
+        public string SlnVisualStudioVersion => PathVersionNumber.Split('.')[0];
 
         public static VisualStudioVersion VS2010 { get; } = new VisualStudioVersion("2010", "11.00", "10.0");
 
@@ -28,7 +28,7 @@ namespace SlimJim.Model
 
         public static VisualStudioVersion ParseVersionString(string versionNumber)
         {
-            var versions = new[] { VS2010, VS2012, VS2013, VS2015 };
+            var versions = new[] {VS2010, VS2012, VS2013, VS2015};
 
             return versions.FirstOrDefault(v => versionNumber.Contains(v.Year)) ?? VS2017;
         }

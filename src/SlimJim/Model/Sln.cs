@@ -9,6 +9,10 @@ namespace SlimJim.Model
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(Sln));
 
+        private readonly IDictionary<string, Folder> _folders = new Dictionary<string, Folder>();
+
+        private string _projectsRootDirectory;
+
         public Sln(string name)
             : this(name, System.Guid.NewGuid().ToString("B"))
         {
@@ -22,50 +26,40 @@ namespace SlimJim.Model
             Version = VisualStudioVersion.VS2017;
         }
 
-        private readonly IDictionary<string, Folder> _folders = new Dictionary<string, Folder>();
-
         public string Name { get; }
         public string Guid { get; }
         public VisualStudioVersion Version { get; set; }
 
-        private string _projectsRootDirectory;
         public string ProjectsRootDirectory
         {
             get => _projectsRootDirectory;
             set
             {
                 if (value != null && (value.EndsWith("/") || value.EndsWith(@"\")))
-                {
                     _projectsRootDirectory = value.Substring(0, value.Length - 1);
-                }
                 else
-                {
                     _projectsRootDirectory = value;
-                }
             }
         }
+
         public List<CsProj> Projects { get; }
 
         public IEnumerable<Folder> Folders => _folders.Count > 0 ? _folders.Values : null;
 
         public void AddProjects(params CsProj[] csProjs)
         {
-            foreach (CsProj proj in csProjs)
-            {
+            foreach (var proj in csProjs)
                 if (!Projects.Contains(proj))
                 {
                     Projects.Add(proj);
                     AddProjectToFolder(proj);
                 }
-            }
         }
 
         private void AddProjectToFolder(CsProj proj)
         {
-            if (string.IsNullOrEmpty(ProjectsRootDirectory) || !proj.Path.StartsWith(ProjectsRootDirectory, StringComparison.InvariantCultureIgnoreCase))
-            {
-                return;
-            }
+            if (string.IsNullOrEmpty(ProjectsRootDirectory) || !proj.Path.StartsWith(ProjectsRootDirectory,
+                    StringComparison.InvariantCultureIgnoreCase)) return;
 
             var relativeFolderPath = GetSolutionFolderPath(proj);
 
@@ -88,7 +82,11 @@ namespace SlimJim.Model
 
             Log.Debug("Creating solution folder for " + relativeFolderPath);
 
-            var newFolder = new Folder { FolderName = Path.GetFileName(relativeFolderPath), Guid = System.Guid.NewGuid().ToString("B") };
+            var newFolder = new Folder
+            {
+                FolderName = Path.GetFileName(relativeFolderPath),
+                Guid = System.Guid.NewGuid().ToString("B")
+            };
 
             var parentFolderPath = Path.GetDirectoryName(relativeFolderPath);
             if (!string.IsNullOrEmpty(parentFolderPath))

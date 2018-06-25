@@ -5,39 +5,6 @@ namespace SlimJim.Test.Model
 {
     public class ProjectPrototypes
     {
-        public readonly CsProj TheirProject3 = new CsProj
-        {
-            AssemblyName = "TheirProject3",
-            Guid = "{499372E5-5DBF-4DB4-BB1A-9072395C9017}",
-            Path = @"src\TheirProject3\TheirProject3.csproj",
-            ProjectTypeGuid = "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"
-        };
-
-        public readonly CsProj TheirProject2 = new CsProj
-        {
-            AssemblyName = "TheirProject2",
-            Guid = "{58E0EE99-9DCA-45C4-AB04-48D67316F71D}",
-            Path = @"src\TheirProject2\TheirProject2.csproj",
-            ProjectTypeGuid = "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"
-        };
-
-        public readonly CsProj TheirProject1 = new CsProj
-        {
-            AssemblyName = "TheirProject1",
-            Guid = "{74CBCCEE-C805-49C3-9EB8-10B48CCC3A6F}",
-            Path = @"src\TheirProject1\TheirProject1.csproj",
-            ProjectTypeGuid = "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"
-        };
-
-        public readonly CsProj MyProject = new CsProj
-        {
-            AssemblyName = "MyProject",
-            Guid = "{E75347BE-2125-4325-818D-0ECC760F11BA}",
-            Path = @"src\MyProject\MyProject.csproj",
-            ProjectTypeGuid = "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}",
-            TargetFrameworkVersion = "v3.5"
-        };
-
         public readonly CsProj MyMultiFrameworkProject35 = new CsProj
         {
             AssemblyName = "MyMultiFrameworkProject",
@@ -54,6 +21,39 @@ namespace SlimJim.Test.Model
             Path = @"src\MyMultiFrameworkProject\MyMultiFrameworkProject-net40.csproj",
             ProjectTypeGuid = "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}",
             TargetFrameworkVersion = "v4.0"
+        };
+
+        public readonly CsProj MyProject = new CsProj
+        {
+            AssemblyName = "MyProject",
+            Guid = "{E75347BE-2125-4325-818D-0ECC760F11BA}",
+            Path = @"src\MyProject\MyProject.csproj",
+            ProjectTypeGuid = "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}",
+            TargetFrameworkVersion = "v3.5"
+        };
+
+        public readonly CsProj TheirProject1 = new CsProj
+        {
+            AssemblyName = "TheirProject1",
+            Guid = "{74CBCCEE-C805-49C3-9EB8-10B48CCC3A6F}",
+            Path = @"src\TheirProject1\TheirProject1.csproj",
+            ProjectTypeGuid = "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"
+        };
+
+        public readonly CsProj TheirProject2 = new CsProj
+        {
+            AssemblyName = "TheirProject2",
+            Guid = "{58E0EE99-9DCA-45C4-AB04-48D67316F71D}",
+            Path = @"src\TheirProject2\TheirProject2.csproj",
+            ProjectTypeGuid = "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"
+        };
+
+        public readonly CsProj TheirProject3 = new CsProj
+        {
+            AssemblyName = "TheirProject3",
+            Guid = "{499372E5-5DBF-4DB4-BB1A-9072395C9017}",
+            Path = @"src\TheirProject3\TheirProject3.csproj",
+            ProjectTypeGuid = "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"
         };
 
         public readonly CsProj Unrelated1 = new CsProj

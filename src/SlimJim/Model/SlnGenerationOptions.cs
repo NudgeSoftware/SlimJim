@@ -7,17 +7,16 @@ namespace SlimJim.Model
     public class SlnGenerationOptions
     {
         private const string DefaultSolutionName = "SlimJim";
-        private string _projectsRootDirectory;
-        private string _solutionName;
-        private string _slnOutputPath;
         private readonly List<string> _additionalSearchPaths;
-        private readonly List<string> _ignoreDirectoryPatterns;
+        private string _projectsRootDirectory;
+        private string _slnOutputPath;
+        private string _solutionName;
 
         public SlnGenerationOptions(string workingDirectory)
         {
             ProjectsRootDirectory = workingDirectory;
             _additionalSearchPaths = new List<string>();
-            _ignoreDirectoryPatterns = new List<string>();
+            IgnoreDirectoryPatterns = new List<string>();
             TargetProjectNames = new List<string>();
             VisualStudioVersion = VisualStudioVersion.VS2017;
             LoggingThreshold = Level.Info;
@@ -44,11 +43,6 @@ namespace SlimJim.Model
 
         public List<string> AdditionalSearchPaths => _additionalSearchPaths.ConvertAll(ResolvePath);
 
-        private string ResolvePath(string p)
-        {
-            return !Path.IsPathRooted(p) ? Path.Combine(ProjectsRootDirectory, p) : p;
-        }
-
         public string SlnOutputPath
         {
             get => _slnOutputPath != null ? ResolvePath(_slnOutputPath) : ProjectsRootDirectory;
@@ -61,15 +55,10 @@ namespace SlimJim.Model
             {
                 if (string.IsNullOrEmpty(_solutionName))
                 {
-                    if (TargetProjectNames.Count > 0)
-                    {
-                        return string.Join("_", TargetProjectNames);
-                    }
+                    if (TargetProjectNames.Count > 0) return string.Join("_", TargetProjectNames);
 
                     if (!string.IsNullOrEmpty(ProjectsRootDirectory))
-                    {
                         return GetLastSegmentNameOfProjectsRootDirectory();
-                    }
 
                     return DefaultSolutionName;
                 }
@@ -79,24 +68,26 @@ namespace SlimJim.Model
             set => _solutionName = value;
         }
 
-        private string GetLastSegmentNameOfProjectsRootDirectory()
-        {
-            var dir = new DirectoryInfo(ProjectsRootDirectory);
-            
-            if (string.IsNullOrEmpty(dir.Name) || dir.FullName == dir.Root.FullName)
-            {
-                return DefaultSolutionName;
-            }
-            return dir.Name;
-        }
-
         public SlnGenerationMode Mode => TargetProjectNames.Count == 0
             ? SlnGenerationMode.FullGraph
             : SlnGenerationMode.PartialGraph;
 
-        public List<string> IgnoreDirectoryPatterns => _ignoreDirectoryPatterns;
+        public List<string> IgnoreDirectoryPatterns { get; }
 
         public bool LoadAndSaveSolutionWithVS { get; set; }
+
+        private string ResolvePath(string p)
+        {
+            return !Path.IsPathRooted(p) ? Path.Combine(ProjectsRootDirectory, p) : p;
+        }
+
+        private string GetLastSegmentNameOfProjectsRootDirectory()
+        {
+            var dir = new DirectoryInfo(ProjectsRootDirectory);
+
+            if (string.IsNullOrEmpty(dir.Name) || dir.FullName == dir.Root.FullName) return DefaultSolutionName;
+            return dir.Name;
+        }
 
         public void AddAdditionalSearchPaths(params string[] searchPaths)
         {
@@ -108,9 +99,9 @@ namespace SlimJim.Model
             TargetProjectNames.AddRange(targetProjectNames);
         }
 
-        public void AddIgnoreDirectoryPatterns(params string [] patterns)
+        public void AddIgnoreDirectoryPatterns(params string[] patterns)
         {
-            _ignoreDirectoryPatterns.AddRange(patterns);
+            IgnoreDirectoryPatterns.AddRange(patterns);
         }
     }
 }

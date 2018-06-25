@@ -8,10 +8,10 @@ namespace SlimJim.Model
     public class SlnBuilder
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(SlnFileGenerator));
+        private static SlnBuilder _overriddenBuilder;
 
         private readonly List<CsProj> _projectsList;
         private Sln _builtSln;
-        private static SlnBuilder _overriddenBuilder;
         private SlnGenerationOptions _options;
 
         public SlnBuilder(List<CsProj> projectsList)
@@ -37,32 +37,23 @@ namespace SlimJim.Model
         private void AddProjectsToSln(SlnGenerationOptions options)
         {
             if (options.Mode == SlnGenerationMode.PartialGraph)
-            {
                 AddPartialProjectGraphToSln(options);
-            }
             else
-            {
                 AddAllProjectsToSln();
-            }
         }
 
         private void AddPartialProjectGraphToSln(SlnGenerationOptions options)
         {
-            Log.Info("Building partial graph solution for target projects: " + string.Join(", ", options.TargetProjectNames));
+            Log.Info("Building partial graph solution for target projects: " +
+                     string.Join(", ", options.TargetProjectNames));
 
-            foreach (string targetProjectName in options.TargetProjectNames)
+            foreach (var targetProjectName in options.TargetProjectNames)
             {
-                CsProj rootProject = AddAssemblySubtree(targetProjectName);
+                var rootProject = AddAssemblySubtree(targetProjectName);
 
-                if (rootProject == null)
-                {
-                    Log.WarnFormat("Project {0} not found.", targetProjectName);
-                }
+                if (rootProject == null) Log.WarnFormat("Project {0} not found.", targetProjectName);
 
-                if (options.SkipAfferentAssemblyReferences == false)
-                {
-                    AddAfferentReferencesToProject(rootProject);
-                }
+                if (options.SkipAfferentAssemblyReferences == false) AddAfferentReferencesToProject(rootProject);
             }
         }
 
@@ -75,7 +66,7 @@ namespace SlimJim.Model
 
         private CsProj AddAssemblySubtree(string assemblyName, string targetFrameworkVersion = "")
         {
-            CsProj project = FindProjectByAssemblyName(assemblyName, targetFrameworkVersion);
+            var project = FindProjectByAssemblyName(assemblyName, targetFrameworkVersion);
 
             AddProjectAndReferences(project);
 
@@ -90,31 +81,37 @@ namespace SlimJim.Model
             if (matches.Count <= 1)
             {
                 var single = matches.SingleOrDefault();
-                if (single != null) Log.InfoFormat("Found projects with AssemblyName {0}: {1}", assemblyName, single.Path);
+                if (single != null)
+                    Log.InfoFormat("Found projects with AssemblyName {0}: {1}", assemblyName, single.Path);
                 return single;
             }
 
             //TODO: filter projects that don't specify version
             if (string.IsNullOrEmpty(targetFrameworkVersion))
             {
-                Log.WarnFormat("Found multiple projects with AssemblyName {0} and no target framework version is specified: {1}", assemblyName, string.Join(", ", matches.Select(m => m.Path)));
+                Log.WarnFormat(
+                    "Found multiple projects with AssemblyName {0} and no target framework version is specified: {1}",
+                    assemblyName, string.Join(", ", matches.Select(m => m.Path)));
                 return matches.First();
             }
 
             var myVersion = new Version(targetFrameworkVersion.Substring(1));
             var versions = matches
-                            .Where(m => m.TargetFrameworkVersion != null && m.TargetFrameworkVersion.StartsWith("v"))
-                            .ToDictionary(m => new Version(m.TargetFrameworkVersion.Substring(1)));
+                .Where(m => m.TargetFrameworkVersion != null && m.TargetFrameworkVersion.StartsWith("v"))
+                .ToDictionary(m => new Version(m.TargetFrameworkVersion.Substring(1)));
 
             var closest = versions.Where(v => v.Key <= myVersion).OrderByDescending(v => v.Key).FirstOrDefault();
 
             if (closest.Value != null)
             {
-                Log.InfoFormat("Found multiple projects with AssemblyName {0}: {1} and chose {2}", assemblyName, string.Join(", ", matches.Select(m => m.Path)), closest.Value.Path);
+                Log.InfoFormat("Found multiple projects with AssemblyName {0}: {1} and chose {2}", assemblyName,
+                    string.Join(", ", matches.Select(m => m.Path)), closest.Value.Path);
                 return closest.Value;
             }
 
-            Log.WarnFormat("Found multiple projects with AssemblyName {0}: {1} and none have compatible TargetFrameworkVersion property. Choosing {2}", assemblyName, string.Join(", ", matches.Select(m => m.Path)), matches.First());
+            Log.WarnFormat(
+                "Found multiple projects with AssemblyName {0}: {1} and none have compatible TargetFrameworkVersion property. Choosing {2}",
+                assemblyName, string.Join(", ", matches.Select(m => m.Path)), matches.First());
             return matches.First();
         }
 
@@ -126,10 +123,7 @@ namespace SlimJim.Model
 
                 IncludeEfferentProjectReferences(project);
 
-                if (_options.IncludeEfferentAssemblyReferences)
-                {
-                    IncludeEfferentAssemblyReferences(project);
-                }
+                if (_options.IncludeEfferentAssemblyReferences) IncludeEfferentAssemblyReferences(project);
             }
         }
 
@@ -140,23 +134,18 @@ namespace SlimJim.Model
 
         private void IncludeEfferentProjectReferences(CsProj project)
         {
-            foreach (var referencedProj in project.ReferencedProjects)
-            {
-                AddProjectSubtree(referencedProj.Value);
-            }
+            foreach (var referencedProj in project.ReferencedProjects) AddProjectSubtree(referencedProj.Value);
         }
 
         private void IncludeEfferentAssemblyReferences(CsProj project)
         {
-            foreach (string assemblyName in project.ReferencedAssemblyNames)
-            {
+            foreach (var assemblyName in project.ReferencedAssemblyNames)
                 AddAssemblySubtree(assemblyName, project.TargetFrameworkVersion);
-            }
         }
 
         private void AddProjectSubtree(string projectGuid)
         {
-            CsProj referencedProject = FindProjectByProjectGuid(projectGuid);
+            var referencedProject = FindProjectByProjectGuid(projectGuid);
 
             AddProjectAndReferences(referencedProject);
         }
@@ -165,13 +154,14 @@ namespace SlimJim.Model
         {
             if (project != null)
             {
-                List<CsProj> afferentAssemblyReferences = _projectsList.FindAll(
+                var afferentAssemblyReferences = _projectsList.FindAll(
                     csp => csp.ReferencedAssemblyNames.Contains(project.AssemblyName));
 
                 AddAfferentReferences(afferentAssemblyReferences);
 
-                List<CsProj> afferentProjectReferences =
-                    _projectsList.FindAll(csp => csp.ReferencedProjects.Select(tuple => tuple.Value).Contains(project.Guid));
+                var afferentProjectReferences =
+                    _projectsList.FindAll(csp =>
+                        csp.ReferencedProjects.Select(tuple => tuple.Value).Contains(project.Guid));
 
                 AddAfferentReferences(afferentProjectReferences);
             }
@@ -179,10 +169,7 @@ namespace SlimJim.Model
 
         private void AddAfferentReferences(List<CsProj> afferentReferences)
         {
-            foreach (CsProj assemblyReference in afferentReferences)
-            {
-                AddProjectAndReferences(assemblyReference);
-            }
+            foreach (var assemblyReference in afferentReferences) AddProjectAndReferences(assemblyReference);
         }
 
         private CsProj FindProjectByProjectGuid(string projectGuid)

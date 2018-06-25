@@ -26,24 +26,16 @@ namespace SlimJim.Model
 
         public void ReferencesAssemblies(params CsProj[] assemblyReferences)
         {
-            foreach (CsProj reference in assemblyReferences)
-            {
+            foreach (var reference in assemblyReferences)
                 if (!ReferencedAssemblyNames.Contains(reference.AssemblyName))
-                {
                     ReferencedAssemblyNames.Add(reference.AssemblyName);
-                }
-            }
         }
 
         public void ReferencesProjects(params CsProj[] projectReferences)
         {
-            foreach (CsProj reference in projectReferences)
-            {
+            foreach (var reference in projectReferences)
                 if (!ReferencedProjects.Select(tuple => tuple.Value).Contains(reference.Guid))
-                {
                     ReferencedProjects.Add(reference.AssemblyName, reference.Guid);
-                }
-            }
         }
 
         public override string ToString()

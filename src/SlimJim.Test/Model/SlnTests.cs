@@ -9,18 +9,23 @@ namespace SlimJim.Test.Model
     public class SlnTests
     {
         private readonly string slnGuid = new Guid().ToString("B");
-        
-        [Test]
-        public void VersionDefaultsTo2017()
-        {
-            Assert.That(new Sln("sln", slnGuid).Version, Is.EqualTo(VisualStudioVersion.VS2017));
-        }
 
         [Test]
-        public void GuidFormatIncludesCurlyBraces()
+        public void CreatesNestedSolutionFolders()
         {
-            Assert.That(new Sln("sample", slnGuid).Guid, Does.StartWith("{"));
-            Assert.That(new Sln("sample", slnGuid).Guid, Does.EndWith("}"));
+            var sln = new Sln("sample", slnGuid) {ProjectsRootDirectory = "Fake/Example"};
+            var proj = new CsProj
+            {
+                Path = "Fake/Example/Grouping1/ModuleA/ProjectA/ProjectA.csproj",
+                Guid = Guid.NewGuid().ToString("B")
+            };
+            sln.AddProjects(proj);
+
+            var child = sln.Folders.First(f => f.FolderName == "ModuleA");
+            var parent = sln.Folders.First(f => f.FolderName == "Grouping1");
+
+            Assert.That(parent.ContentGuids, Is.EqualTo(new[] {child.Guid}));
+            Assert.That(child.ContentGuids, Is.EqualTo(new[] {proj.Guid}));
         }
 
         [Test]
@@ -36,9 +41,9 @@ namespace SlimJim.Test.Model
         [Test]
         public void CreatesSolutionFoldersForNestedProjectStructure()
         {
-            var sln = new Sln("sample", slnGuid) { ProjectsRootDirectory = "Fake/Example" };
-            sln.AddProjects(new CsProj { Path = "Fake/Example/ModuleA/ProjectA/ProjectA.csproj" });
-            sln.AddProjects(new CsProj { Path = "Fake/Example/ModuleA/ProjectB/ProjectB.csproj" });
+            var sln = new Sln("sample", slnGuid) {ProjectsRootDirectory = "Fake/Example"};
+            sln.AddProjects(new CsProj {Path = "Fake/Example/ModuleA/ProjectA/ProjectA.csproj"});
+            sln.AddProjects(new CsProj {Path = "Fake/Example/ModuleA/ProjectB/ProjectB.csproj"});
 
             var folder = sln.Folders.FirstOrDefault();
 
@@ -47,27 +52,30 @@ namespace SlimJim.Test.Model
         }
 
         [Test]
-        public void CreatesNestedSolutionFolders()
+        public void GuidFormatIncludesCurlyBraces()
         {
-            var sln = new Sln("sample", slnGuid) { ProjectsRootDirectory = "Fake/Example" };
-            var proj = new CsProj { Path = "Fake/Example/Grouping1/ModuleA/ProjectA/ProjectA.csproj", Guid = Guid.NewGuid().ToString("B")};
-            sln.AddProjects(proj);
-
-            var child = sln.Folders.First(f => f.FolderName == "ModuleA");
-            var parent = sln.Folders.First(f => f.FolderName == "Grouping1");
-
-            Assert.That(parent.ContentGuids, Is.EqualTo(new[] {child.Guid}));
-            Assert.That(child.ContentGuids, Is.EqualTo(new[] { proj.Guid }));
+            Assert.That(new Sln("sample", slnGuid).Guid, Does.StartWith("{"));
+            Assert.That(new Sln("sample", slnGuid).Guid, Does.EndWith("}"));
         }
 
         [Test]
         public void HandlesTrailingSlashOnRootDirectory()
         {
-            var sln = new Sln("sample", slnGuid) { ProjectsRootDirectory = "Fake/Example/" };
-            var proj = new CsProj { Path = "Fake/Example/ModuleA/ProjectA/ProjectA.csproj", Guid = Guid.NewGuid().ToString("B") };
+            var sln = new Sln("sample", slnGuid) {ProjectsRootDirectory = "Fake/Example/"};
+            var proj = new CsProj
+            {
+                Path = "Fake/Example/ModuleA/ProjectA/ProjectA.csproj",
+                Guid = Guid.NewGuid().ToString("B")
+            };
             sln.AddProjects(proj);
 
             Assert.That(sln.Folders.FirstOrDefault(f => f.FolderName == "ModuleA"), Is.Not.Null, "Folders");
+        }
+
+        [Test]
+        public void VersionDefaultsTo2017()
+        {
+            Assert.That(new Sln("sln", slnGuid).Version, Is.EqualTo(VisualStudioVersion.VS2017));
         }
     }
 }
