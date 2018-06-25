@@ -27,6 +27,7 @@ namespace SlimJim.Infrastructure
             var files = FindAllProjectFiles(options);
             var projects = PopulateTopLevelProjectGuids(files);
             projects = PopulateProjectReferenceGuids(projects);
+            projects = PopulateRemainingProjectGuids(projects);
 
             return projects;
         }
@@ -76,6 +77,43 @@ namespace SlimJim.Infrastructure
                     if (reference.Value == Guid.Empty.ToString())
                         copiedReferences[reference.Key] =
                             projects.Find(proj => proj.AssemblyName == reference.Key).Guid;
+
+                project.ReferencedProjects = copiedReferences;
+            }
+
+            return projects;
+        }
+
+        /// <summary>
+        /// At this point, we would have filled out project guids for projects that
+        /// were still referenced in an old style CsProj, thus having a project Guid.
+        /// That means the remaining ones are only referenced in new style projects,
+        /// which means we can give them whatever guid we want here.
+        /// </summary>
+        /// <param name="projects"></param>
+        /// <returns></returns>
+        private List<CsProj> PopulateRemainingProjectGuids(List<CsProj> projects)
+        {
+            var projectGuidMap = new Dictionary<string, string>();
+
+            foreach (var project in projects)
+            {
+                if (project.Guid == Guid.Empty.ToString())
+                {
+                    var guid = Guid.NewGuid().ToString("B").ToUpperInvariant();
+                    project.Guid = guid;
+                    projectGuidMap.Add(project.AssemblyName, guid);
+                }
+            }
+
+            foreach (var project in projects)
+            {
+                var copiedReferences = new Dictionary<string, string>(project.ReferencedProjects);
+
+                foreach (var reference in project.ReferencedProjects)
+                    if (reference.Value == Guid.Empty.ToString())
+                        copiedReferences[reference.Key] =
+                            projectGuidMap[reference.Key];
 
                 project.ReferencedProjects = copiedReferences;
             }

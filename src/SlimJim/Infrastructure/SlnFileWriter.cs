@@ -14,7 +14,7 @@ namespace SlimJim.Infrastructure
         {
             var outputFile = new FileInfo(GetOutputFilePath(writeInDirectory, solution));
 
-            if (!outputFile.Directory.Exists) outputFile.Directory.Create();
+            if (outputFile.Directory != null && !outputFile.Directory.Exists) outputFile.Directory.Create();
 
             var renderer = new SlnFileRenderer(solution);
             var fileContents = renderer.Render();
