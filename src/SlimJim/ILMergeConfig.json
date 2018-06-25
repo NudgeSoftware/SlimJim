@@ -1,0 +1,10 @@
+﻿{
+  "General": {
+    "AlternativeILMergePath" : "..\\src\\packages\\ilmerge\\2.14.1208\\tools\\ilmerge.exe",
+    "InputAssemblies": [
+      "log4net.dll", 
+      "NDesk.Options.dll",
+      "Antlr3.StringTemplate.dll"
+    ]
+  }
+}

@@ -6,11 +6,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlimJim", "SlimJim\SlimJim.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlimJim.Test", "SlimJim.Test\SlimJim.Test.csproj", "{F28F7DCF-30E4-40DF-9FCF-FFFA17ECBA7F}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8C1DFC04-8182-45D3-BB99-64E01380EDB4}"
-	ProjectSection(SolutionItems) = preProject
-		..\IntegratedBuild.proj = ..\IntegratedBuild.proj
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
