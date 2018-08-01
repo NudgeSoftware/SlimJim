@@ -9,7 +9,6 @@ $sln.Folders:{ f | Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "$f.Folde
 EndProject};separator="\r\n"$
 $endif$
 
-
 Global
 $if(sln.Projects)$
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
