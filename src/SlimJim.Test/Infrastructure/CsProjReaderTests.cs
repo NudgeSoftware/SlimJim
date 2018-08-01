@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using NUnit.Framework;
 using SlimJim.Infrastructure;
@@ -55,10 +56,10 @@ namespace SlimJim.Test.Infrastructure
                 "System.Data",
                 "System.Xml"
             }));
-            Assert.That(project.ReferencedProjects, Is.EqualTo(new[]
+            Assert.That(project.ReferencedProjects, Is.EqualTo(new Dictionary<string, string>
             {
-                ("MyApp.Core", "{99036BB6-4F97-4FCC-AF6C-0345A5089099}"),
-                ("MyOtherProject", "{69036BB3-4F97-4F9C-AF2C-0349A5049060}")
+                {"MyApp.Core", "{99036BB6-4F97-4FCC-AF6C-0345A5089099}"},
+                {"MyOtherProject", "{69036BB3-4F97-4F9C-AF2C-0349A5049060}"}
             }));
         }
 
