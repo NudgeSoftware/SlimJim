@@ -166,7 +166,7 @@ namespace SlimJim.Infrastructure
 
                 var platformTargets = platformTarget as IList<XElement> ?? platformTarget.ToList();
                 if (platformTargets.Any() && !string.IsNullOrWhiteSpace(platformTargets.First().Value))
-                    return platformTargets.First().Value;
+                    return platformTargets.First().Value.Replace("AnyCPU", CsProj.AnyCPU);
             }
 
             return CsProj.AnyCPU;
@@ -186,7 +186,7 @@ namespace SlimJim.Infrastructure
 
                 var platformTargets = platformTarget as IList<XElement> ?? platformTarget.ToList();
                 if (platformTargets.Any() && !string.IsNullOrWhiteSpace(platformTargets.First().Value))
-                    return platformTargets.First().Value;
+                    return platformTargets.First().Value.Replace("AnyCPU", CsProj.AnyCPU);
             }
 
             return CsProj.AnyCPU;
