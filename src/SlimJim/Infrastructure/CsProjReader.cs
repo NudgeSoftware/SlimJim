@@ -36,17 +36,26 @@ namespace SlimJim.Infrastructure
                 };
 
             // new CsProj format
-            return new CsProj
+            try
             {
-                Path = GetRelativePath(csProjFile.FullName, Environment.CurrentDirectory),
-                AssemblyName = csProjFile.Name.Replace(".csproj", string.Empty),
-                ProjectTypeGuid = GetMainProjectTypeGuid("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}"),
-                Guid =
-                    Guid.Empty
-                        .ToString(), // will be filled in later once we find what it is from other projects that reference it
-                ReferencedProjects = ReadNewProjectReferences(xml),
-                Platform = FindPlatformTarget(xml)
-            };
+                return new CsProj
+                {
+                    Path = GetRelativePath(csProjFile.FullName, Environment.CurrentDirectory),
+                    AssemblyName = csProjFile.Name.Replace(".csproj", string.Empty),
+                    ProjectTypeGuid = GetMainProjectTypeGuid("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}"),
+                    Guid =
+                        Guid.Empty
+                            .ToString(), // will be filled in later once we find what it is from other projects that reference it
+                    ReferencedProjects = ReadNewProjectReferences(xml),
+                    Platform = FindPlatformTarget(xml)
+                };
+            }
+            catch (ArgumentException ae) when (ae.Message == "An item with the same key has already been added.")
+            {
+                Console.Error.WriteLine($"The project {csProjFile.FullName} has a duplicate project reference.");
+                Environment.Exit(-1);
+                return null;
+            }
         }
 
         private static string GetMainProjectTypeGuid(string projectTypeGuidsString)
